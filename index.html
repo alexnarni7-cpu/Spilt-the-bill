@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Split the Bill</title>
+
+<!-- PWA / installable app -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#4f6ef7" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Split Bill" />
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+  :root {
+    --bg: #eef1f6;
+    --card: #ffffff;
+    --card2: #f4f6fa;
+    --line: #e4e8ef;
+    --text: #16202e;
+    --muted: #74808f;
+    --accent: #4f6ef7;
+    --accent-soft: #eaeefe;
+    --accent-ink: #ffffff;
+    --accent2: #12b76a;
+    --danger: #ef4444;
+    --radius: 18px;
+    --shadow: 0 1px 2px rgba(16,32,56,.04), 0 6px 20px rgba(16,32,56,.06);
+    --tap: 46px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(180deg, #f6f8fc 0%, var(--bg) 240px);
+    color: var(--text);
+    line-height: 1.45;
+    padding: 20px 16px calc(96px + env(safe-area-inset-bottom));
+    max-width: 640px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .hero { margin: 4px 4px 22px; }
+  h1 { font-size: 1.7rem; letter-spacing: -.02em; margin: 6px 0 4px; }
+  h2 {
+    font-size: 1.05rem; margin: 0 0 14px; color: var(--text);
+    display: flex; align-items: center; gap: 10px; letter-spacing: -.01em;
+  }
+  h2 .n {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    font-size: .85rem; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .sub { color: var(--muted); font-size: 0.9rem; margin: 0 0 20px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    animation: rise .35s ease both;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+  button {
+    font: inherit; font-weight: 500;
+    border: none;
+    border-radius: 12px;
+    padding: 0 18px;
+    min-height: var(--tap);
+    cursor: pointer;
+    background: var(--card2);
+    color: var(--text);
+    transition: transform .08s ease, filter .15s ease, background .15s ease;
+  }
+  button:hover { filter: brightness(.98); }
+  button:active { transform: scale(.96); }
+  button.primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; box-shadow: 0 4px 12px rgba(79,110,247,.30); }
+  button.primary:hover { filter: brightness(1.05); }
+  button.green { background: var(--accent2); color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(18,183,106,.25); }
+  button.ghost { background: transparent; border: 1.5px solid var(--line); color: var(--text); }
+  button.ghost:hover { background: var(--card2); }
+  button.tiny { min-height: 36px; padding: 0 10px; font-size: 1rem; }
+  input, select {
+    font: inherit;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 0 14px;
+    min-height: var(--tap);
+    width: 100%;
+  }
+  input::placeholder { color: #aab3c0; }
+  input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  label { font-size: 0.8rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .grow { flex: 1; }
+  .muted { color: var(--muted); }
+  .hidden { display: none; }
+  .item {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: var(--card2);
+    animation: rise .25s ease both;
+  }
+  .item-top { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .item-top input[type=text] { flex: 1; background: #fff; }
+  .item-top input[type=number] { width: 96px; background: #fff; text-align: right; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 9px 15px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+    background: #fff;
+    color: var(--muted);
+    transition: transform .08s ease, background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .chip:active { transform: scale(.94); }
+  .chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  .person-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--accent-soft); border: 1px solid transparent; color: var(--accent);
+    border-radius: 999px; padding: 7px 6px 7px 14px; font-size: 0.9rem; font-weight: 600;
+  }
+  .person-tag button { min-height: auto; padding: 4px 8px; border-radius: 999px; background: transparent; color: var(--accent); font-size: .8rem; opacity: .7; }
+  .person-tag button:hover { opacity: 1; color: var(--danger); }
+  .totals-row {
+    display: flex; justify-content: space-between; align-items: center; padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .totals-row:last-child { border-bottom: none; }
+  .big { font-size: 1.3rem; font-weight: 700; letter-spacing: -.01em; }
+  .breakdown { font-size: 0.8rem; color: var(--muted); margin-top: 3px; }
+  .progress { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 12px; }
+  .progress > div { height: 100%; background: var(--accent); width: 0%; transition: width .25s ease; }
+  .field { margin-bottom: 12px; }
+  .seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; flex: none; }
+  .seg button { border-radius: 0; min-height: var(--tap); background: #fff; padding: 0 16px; font-weight: 600; color: var(--muted); }
+  .seg button.on { background: var(--accent); color: var(--accent-ink); }
+  .warn {
+    color: #92400e; background: #fef3c7; border: 1px solid #fde68a;
+    font-size: 0.85rem; border-radius: 12px; padding: 10px 12px; margin: 14px 0 0;
+  }
+  .stack > * + * { margin-top: 8px; }
+  /* sticky running-total bar */
+  .sticky-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(255,255,255,.85); backdrop-filter: saturate(180%) blur(12px);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 24px rgba(16,32,56,.07);
+  }
+  .sticky-inner {
+    max-width: 640px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sticky-inner .lbl { font-size: .8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .sticky-inner .amt { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🧾 Split the Bill</h1>
+  <p class="sub" style="margin-bottom:0;">Scan a receipt, assign items to people, and split tax &amp; tip proportionally.</p>
+</div>
+
+<!-- STEP 1: SCAN -->
+<div class="card">
+  <h2><span class="n">1</span> Scan or add items</h2>
+  <div class="row" style="flex-wrap:wrap; gap:10px;">
+    <label class="primary" style="display:inline-block;">
+      <button class="primary" type="button" onclick="document.getElementById('file').click()">📷 Scan receipt photo</button>
+    </label>
+    <button class="ghost" type="button" onclick="addItem()">+ Add item manually</button>
+  </div>
+  <input id="file" type="file" accept="image/*" capture="environment" class="hidden" onchange="runOCR(this.files[0])" />
+  <div id="ocrStatus" class="hidden" style="margin-top:12px;">
+    <div class="muted" id="ocrText">Reading receipt…</div>
+    <div class="progress"><div id="ocrBar"></div></div>
+  </div>
+  <p class="sub" style="margin-top:12px; margin-bottom:0;">Tip: OCR is a starting point — always check the prices it pulls in and fix anything that's off.</p>
+</div>
+
+<!-- STEP 2: PEOPLE -->
+<div class="card">
+  <h2><span class="n">2</span> Who's splitting?</h2>
+  <div class="row" style="margin-bottom:12px;">
+    <input id="personName" class="grow" type="text" placeholder="Add a name…" onkeydown="if(event.key==='Enter')addPerson()" />
+    <button class="green" type="button" onclick="addPerson()">Add</button>
+  </div>
+  <div id="peopleList" class="chips"></div>
+</div>
+
+<!-- STEP 3: ITEMS -->
+<div class="card">
+  <h2><span class="n">3</span> Assign items</h2>
+  <p class="sub" style="margin-top:-6px;">Tap names under each item to mark who shared it. Cost splits evenly among them.</p>
+  <div id="itemsList"></div>
+  <button class="ghost" type="button" onclick="addItem()" style="margin-top:4px;">+ Add item</button>
+</div>
+
+<!-- STEP 4: TAX & TIP -->
+<div class="card">
+  <h2><span class="n">4</span> Tax &amp; tip</h2>
+  <div class="row" style="gap:16px; flex-wrap:wrap;">
+    <div class="field grow" style="min-width:130px;">
+      <label>Tax</label>
+      <div class="row">
+        <input id="taxVal" type="number" min="0" step="0.01" value="0" oninput="render()" />
+        <div class="seg" id="taxSeg">
+          <button type="button" class="on" onclick="setMode('tax','amount',this)">$</button>
+          <button type="button" onclick="setMode('tax','percent',this)">%</button>
+        </div>
+      </div>
+    </div>
+    <div class="field grow" style="min-width:130px;">
+      <label>Tip</label>
+      <div class="row">
+        <input id="tipVal" type="number" min="0" step="0.01" value="0" oninput="render()" />
+        <div class="seg" id="tipSeg">
+          <button type="button" class="on" onclick="setMode('tip','amount',this)">$</button>
+          <button type="button" onclick="setMode('tip','percent',this)">%</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="sub" style="margin-bottom:0; margin-top:6px;">Percentages are taken on each person's share of the items subtotal.</p>
+</div>
+
+<!-- RESULTS -->
+<div class="card">
+  <h2><span class="n">5</span> Who owes what</h2>
+  <div id="results"></div>
+  <div class="totals-row" style="margin-top:6px; border-top:1.5px solid var(--line); padding-top:14px;">
+    <span class="big">Grand total</span>
+    <span class="big" id="grandTotal">$0.00</span>
+  </div>
+  <p id="unassignedWarn" class="warn hidden"></p>
+</div>
+
+<!-- sticky running total -->
+<div class="sticky-bar">
+  <div class="sticky-inner">
+    <span class="lbl">Grand total</span>
+    <span class="amt" id="stickyTotal">$0.00</span>
+  </div>
+</div>
+
+<script>
+let people = [];      // [{id, name}]
+let items = [];       // [{id, name, price, assigned:Set(personId)}]
+let taxMode = 'amount', tipMode = 'amount';
+let pid = 1, iid = 1;
+
+function uid(p){ return p==='person' ? 'p'+(pid++) : 'i'+(iid++); }
+
+/* ---------- PEOPLE ---------- */
+function addPerson(){
+  const input = document.getElementById('personName');
+  const name = input.value.trim();
+  if(!name) return;
+  people.push({ id: uid('person'), name });
+  input.value = '';
+  input.focus();
+  render();
+}
+function removePerson(id){
+  people = people.filter(p => p.id !== id);
+  items.forEach(it => it.assigned.delete(id));
+  render();
+}
+
+/* ---------- ITEMS ---------- */
+function addItem(name='', price=0){
+  items.push({ id: uid('item'), name, price: +price || 0, assigned: new Set() });
+  render();
+}
+function removeItem(id){ items = items.filter(it => it.id !== id); render(); }
+function updateItem(id, field, val){
+  const it = items.find(i => i.id === id);
+  if(!it) return;
+  if(field === 'price') it.price = parseFloat(val) || 0;
+  else it.name = val;
+  // don't full re-render on text typing (keeps focus); only recompute totals
+  computeAndShowResults();
+}
+function toggleAssign(itemId, personId){
+  const it = items.find(i => i.id === itemId);
+  if(!it) return;
+  it.assigned.has(personId) ? it.assigned.delete(personId) : it.assigned.add(personId);
+  render();
+}
+
+/* ---------- TAX / TIP ---------- */
+function setMode(which, mode, btn){
+  if(which==='tax') taxMode = mode; else tipMode = mode;
+  [...btn.parentElement.children].forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  render();
+}
+// highlight the $ (index 0) or % (index 1) button of a segment programmatically
+function syncSeg(segId, index){
+  const seg = document.getElementById(segId);
+  [...seg.children].forEach((b,i) => b.classList.toggle('on', i === index));
+}
+
+/* ---------- OCR ---------- */
+async function runOCR(file){
+  if(!file) return;
+  const status = document.getElementById('ocrStatus');
+  const bar = document.getElementById('ocrBar');
+  const txt = document.getElementById('ocrText');
+  status.classList.remove('hidden');
+  txt.textContent = 'Reading receipt…';
+  bar.style.width = '5%';
+  try {
+    const { data } = await Tesseract.recognize(file, 'eng', {
+      logger: m => {
+        if(m.status === 'recognizing text') bar.style.width = (m.progress*100).toFixed(0)+'%';
+      }
+    });
+    const { items: found, tax, tip } = parseReceipt(data.text);
+    found.forEach(f => addItem(f.name, f.price));
+
+    // auto-fill tax & tip if the receipt had them (as dollar amounts)
+    const notes = [];
+    if(tax != null){
+      taxMode = 'amount'; syncSeg('taxSeg', 0);
+      document.getElementById('taxVal').value = tax.toFixed(2);
+      notes.push(`tax ${money(tax)}`);
+    }
+    if(tip != null){
+      tipMode = 'amount'; syncSeg('tipSeg', 0);
+      document.getElementById('tipVal').value = tip.toFixed(2);
+      notes.push(`tip ${money(tip)}`);
+    }
+    render();
+
+    if(found.length || notes.length){
+      let msg = found.length ? `Found ${found.length} item(s)` : 'No line items read';
+      if(notes.length) msg += ` plus ${notes.join(' & ')}`;
+      txt.textContent = msg + '. Please double-check everything below.';
+    } else {
+      txt.textContent = 'Couldn’t read this receipt automatically — add items manually below.';
+    }
+    bar.style.width = '100%';
+    setTimeout(() => status.classList.add('hidden'), 3500);
+  } catch(e){
+    txt.textContent = 'OCR failed to load (need internet for the first scan). Add items manually.';
+    console.error(e);
+  }
+}
+
+// Pull line-items plus tax & tip out of raw OCR text.
+function parseReceipt(text){
+  const out = [];
+  let tax = null, tip = null;
+  // lines we never treat as a food item
+  const skip = /\b(subtotal|sub total|total|tax|tip|gratuity|service|balance|change|cash|visa|master|amex|card|auth|tender|due|amount)\b/i;
+  const lastMoney = raw => {
+    const m = raw.match(/\d{1,4}[.,]\d{2}/g);
+    if(!m) return null;
+    const v = parseFloat(m[m.length-1].replace(',', '.'));
+    return (v && v > 0) ? v : null;
+  };
+  text.split('\n').forEach(line => {
+    const raw = line.trim();
+    if(!raw) return;
+    const val = lastMoney(raw);
+    // capture tax / tip amounts (skip "subtotal", and tax % rate lines like "Tax 8.25%")
+    if(/\b(tax)\b/i.test(raw) && !/sub\s*total/i.test(raw) && val && !/%/.test(raw)){
+      tax = (tax || 0) + val; return;
+    }
+    if(/\b(tip|gratuity|service charge)\b/i.test(raw) && val && !/%/.test(raw)){
+      tip = (tip || 0) + val; return;
+    }
+    if(skip.test(raw) || !val) return;
+    let name = raw.replace(/\$?\s*\d{1,4}[.,]\d{2}\s*$/,'').replace(/[\s.\-_]+$/,'').trim();
+    name = name.replace(/^\d+\s*[xX]?\s*/, ''); // strip leading qty
+    if(name.length < 2) name = 'Item';
+    out.push({ name, price: val });
+  });
+  return { items: out, tax, tip };
+}
+
+/* ---------- CALCULATION ---------- */
+function compute(){
+  // per-person items subtotal
+  const sub = {};
+  people.forEach(p => sub[p.id] = 0);
+  let itemsTotal = 0, unassignedTotal = 0;
+
+  items.forEach(it => {
+    itemsTotal += it.price;
+    const sharers = [...it.assigned].filter(id => people.some(p => p.id === id));
+    if(sharers.length === 0){ unassignedTotal += it.price; return; }
+    const each = it.price / sharers.length;
+    sharers.forEach(id => sub[id] += each);
+  });
+
+  const taxVal = parseFloat(document.getElementById('taxVal').value) || 0;
+  const tipVal = parseFloat(document.getElementById('tipVal').value) || 0;
+  const taxTotal = taxMode === 'percent' ? itemsTotal * taxVal/100 : taxVal;
+  const tipTotal = tipMode === 'percent' ? itemsTotal * tipVal/100 : tipVal;
+
+  // distribute tax + tip proportionally to each person's share of items
+  const result = people.map(p => {
+    const share = itemsTotal > 0 ? sub[p.id] / itemsTotal : 0;
+    const tax = taxTotal * share;
+    const tip = tipTotal * share;
+    return { ...p, items: sub[p.id], tax, tip, total: sub[p.id] + tax + tip };
+  });
+
+  return { result, itemsTotal, taxTotal, tipTotal, unassignedTotal,
+           grand: itemsTotal + taxTotal + tipTotal };
+}
+
+function money(n){ return '$' + (n || 0).toFixed(2); }
+
+/* ---------- RENDER ---------- */
+function render(){
+  // people chips
+  const pl = document.getElementById('peopleList');
+  pl.innerHTML = people.length
+    ? people.map(p => `<span class="person-tag">${esc(p.name)}<button onclick="removePerson('${p.id}')" title="Remove">✕</button></span>`).join('')
+    : '<span class="muted">No one added yet.</span>';
+
+  // items
+  const il = document.getElementById('itemsList');
+  if(!items.length){
+    il.innerHTML = '<p class="muted">No items yet — scan a receipt or add one.</p>';
+  } else {
+    il.innerHTML = items.map(it => `
+      <div class="item">
+        <div class="item-top">
+          <input type="text" value="${esc(it.name)}" placeholder="Item name"
+                 oninput="updateItem('${it.id}','name',this.value)" />
+          <input type="number" min="0" step="0.01" value="${it.price}"
+                 oninput="updateItem('${it.id}','price',this.value)" />
+          <button class="tiny ghost" onclick="removeItem('${it.id}')" title="Delete">🗑</button>
+        </div>
+        <div class="chips">
+          ${people.length
+            ? people.map(p => `<span class="chip ${it.assigned.has(p.id)?'on':''}"
+                 onclick="toggleAssign('${it.id}','${p.id}')">${esc(p.name)}</span>`).join('')
+            : '<span class="muted" style="font-size:.8rem;">Add people above to assign.</span>'}
+        </div>
+      </div>`).join('');
+  }
+  computeAndShowResults();
+}
+
+function computeAndShowResults(){
+  const { result, itemsTotal, taxTotal, tipTotal, unassignedTotal, grand } = compute();
+  const res = document.getElementById('results');
+  res.innerHTML = people.length
+    ? result.map(r => `
+        <div class="totals-row">
+          <div>
+            <div>${esc(r.name)}</div>
+            <div class="breakdown">items ${money(r.items)} · tax ${money(r.tax)} · tip ${money(r.tip)}</div>
+          </div>
+          <div class="big">${money(r.total)}</div>
+        </div>`).join('')
+    : '<p class="muted">Add people to see the split.</p>';
+
+  document.getElementById('grandTotal').textContent = money(grand);
+  document.getElementById('stickyTotal').textContent = money(grand);
+
+  const warn = document.getElementById('unassignedWarn');
+  if(unassignedTotal > 0.001){
+    warn.classList.remove('hidden');
+    warn.textContent = `⚠️ ${money(unassignedTotal)} of items aren't assigned to anyone — that amount isn't included in the split.`;
+  } else {
+    warn.classList.add('hidden');
+  }
+}
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+render();
+
+// Register the service worker (makes the app installable + work offline).
+// Only runs over https (e.g. GitHub Pages) — silently skipped when opened as a local file.
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

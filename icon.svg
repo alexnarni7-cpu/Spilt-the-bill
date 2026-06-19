@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6d86ff"/>
+      <stop offset="1" stop-color="#4f6ef7"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- receipt body -->
+  <path fill="#ffffff" d="M168 96h176a16 16 0 0 1 16 16v300l-32-20-32 20-32-20-32 20-32-20-32 20V112a16 16 0 0 1 16-16z"/>
+  <!-- lines -->
+  <rect x="196" y="160" width="120" height="20" rx="10" fill="#4f6ef7"/>
+  <rect x="196" y="208" width="120" height="16" rx="8" fill="#c3cdf9"/>
+  <rect x="196" y="248" width="80"  height="16" rx="8" fill="#c3cdf9"/>
+  <!-- dollar -->
+  <circle cx="332" cy="300" r="54" fill="#12b76a"/>
+  <text x="332" y="332" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="78" font-weight="700" fill="#ffffff" text-anchor="middle">$</text>
+</svg>
