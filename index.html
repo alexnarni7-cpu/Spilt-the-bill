@@ -465,10 +465,17 @@ async function runOCR(file){
   txt.textContent = 'Reading receipt…';
   bar.style.width = '5%';
 
+  let worker;
   try {
-    const { data } = await Tesseract.recognize(file, 'eng', {
-      logger: m => { if(m.status === 'recognizing text') bar.style.width = (m.progress*100).toFixed(0)+'%'; }
+    txt.textContent = 'Enhancing photo…';
+    const processed = await preprocessReceipt(file);
+    txt.textContent = 'Reading receipt…';
+    worker = await Tesseract.createWorker('eng', 1, {
+      logger: m => { if(m.status === 'recognizing text') bar.style.width = Math.round(m.progress*100)+'%'; }
     });
+    // PSM 4 = a single column of text of varying sizes — fits receipts well.
+    await worker.setParameters({ tessedit_pageseg_mode: '4', preserve_interword_spaces: '1' });
+    const { data } = await worker.recognize(processed);
     const { items: found, tax, tip } = parseReceipt(data.text);
     found.forEach(f => addItem(f.name, f.price, true));
 
@@ -492,14 +499,54 @@ async function runOCR(file){
     txt.textContent = 'OCR needs internet for the first scan. Add items by hand below.';
     previewText.textContent = 'Scan unavailable — add items by hand.';
     console.error(e);
+  } finally {
+    if(worker){ try { await worker.terminate(); } catch(e){} }
   }
+}
+
+// Load a File into an <img> element.
+function loadImage(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+// Pre-process the photo for OCR: size to a good range, grayscale, and boost
+// contrast. Tesseract reads clean high-contrast text far better than a raw photo.
+async function preprocessReceipt(file){
+  const img = await loadImage(file);
+  const maxSide = 1800;
+  const longest = Math.max(img.width, img.height) || 1;
+  const scale = Math.min(maxSide / longest, 3);   // upscale small photos (cap 3x), shrink huge ones
+  const w = Math.max(1, Math.round(img.width * scale));
+  const h = Math.max(1, Math.round(img.height * scale));
+
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const imageData = ctx.getImageData(0, 0, w, h);
+  const d = imageData.data;
+  const contrast = 1.45, intercept = 128 * (1 - contrast);
+  for(let i = 0; i < d.length; i += 4){
+    const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];   // grayscale
+    let v = g * contrast + intercept;                      // contrast stretch around mid-gray
+    v = v < 0 ? 0 : v > 255 ? 255 : v;
+    d[i] = d[i+1] = d[i+2] = v;
+  }
+  ctx.putImageData(imageData, 0, 0);
+  return c;
 }
 
 // Pull line-items plus tax & tip out of raw OCR text.
 function parseReceipt(text){
   const out = [];
   let tax = null, tip = null;
-  const skip = /\b(subtotal|sub total|total|tax|tip|gratuity|service|balance|change|cash|visa|master|amex|card|auth|tender|due|amount)\b/i;
+  const skip = /\b(subtotal|sub total|total|tax|tip|gratuity|service|balance|change|cash|visa|master|amex|card|auth|tender|due|amount|order|table|server|guest|qty|receipt|invoice|date|time|phone|tel|www|http)\b/i;
   const lastMoney = raw => {
     const m = raw.match(/\d{1,4}[.,]\d{2}/g);
     if(!m) return null;
@@ -514,8 +561,10 @@ function parseReceipt(text){
     if(/\b(tip|gratuity|service charge)\b/i.test(raw) && val && !/%/.test(raw)){ tip = (tip || 0) + val; return; }
     if(skip.test(raw) || !val) return;
     let name = raw.replace(/\$?\s*\d{1,4}[.,]\d{2}\s*$/,'').replace(/[\s.\-_]+$/,'').trim();
-    name = name.replace(/^\d+\s*[xX]?\s*/, '');
-    if(name.length < 2) name = 'Item';
+    name = name.replace(/^\d+\s*[xX]?\s*/, '');     // strip leading quantity
+    name = name.replace(/\s{2,}/g, ' ').trim();
+    // a real item name has letters; skip phone numbers, totals lines, OCR noise
+    if(!/[a-zA-Z]{2,}/.test(name)) return;
     out.push({ name, price: val });
   });
   return { items: out, tax, tip };
