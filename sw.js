@@ -1,7 +1,7 @@
 // Minimal service worker: caches the app shell so the app is installable
 // and works offline. It does NOT store any of your bill data — only the
 // app's own files (page, icons, and the OCR library).
-const CACHE = 'split-bill-v1';
+const CACHE = 'split-bill-v2';
 const ASSETS = [
   '.',
   'index.html',

@@ -7,7 +7,7 @@
 
 <!-- PWA / installable app -->
 <link rel="manifest" href="manifest.webmanifest" />
-<meta name="theme-color" content="#4f6ef7" />
+<meta name="theme-color" content="#f4eee4" />
 <link rel="icon" href="icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -15,228 +15,293 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Split Bill" />
 
+<!-- type -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   :root {
-    --bg: #eef1f6;
-    --card: #ffffff;
-    --card2: #f4f6fa;
-    --line: #e4e8ef;
-    --text: #16202e;
-    --muted: #74808f;
-    --accent: #4f6ef7;
-    --accent-soft: #eaeefe;
-    --accent-ink: #ffffff;
-    --accent2: #12b76a;
-    --danger: #ef4444;
-    --radius: 18px;
-    --shadow: 0 1px 2px rgba(16,32,56,.04), 0 6px 20px rgba(16,32,56,.06);
-    --tap: 46px;
+    --paper: #f4eee4;
+    --card: #fffdf9;
+    --soft: #efe6d7;
+    --line: #e7ddcb;
+    --line-soft: #efe7d9;
+    --ink: #2c2823;
+    --muted: #9a9082;
+    --clay: #c06a4a;
+    --clay-deep: #a85738;
+    --clay-soft: #f3e4da;
+    --danger: #b4543f;
+    --radius: 22px;
+    --tap: 50px;
+    --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --shadow: 0 1px 2px rgba(60,44,30,.04), 0 10px 30px rgba(60,44,30,.05);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0 auto;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(180deg, #f6f8fc 0%, var(--bg) 240px);
-    color: var(--text);
-    line-height: 1.45;
-    padding: 20px 16px calc(96px + env(safe-area-inset-bottom));
-    max-width: 640px;
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    letter-spacing: .005em;
+    padding: 24px 18px calc(104px + env(safe-area-inset-bottom));
+    max-width: 600px;
     -webkit-font-smoothing: antialiased;
   }
-  .hero { margin: 4px 4px 22px; }
-  h1 { font-size: 1.7rem; letter-spacing: -.02em; margin: 6px 0 4px; }
-  h2 {
-    font-size: 1.05rem; margin: 0 0 14px; color: var(--text);
-    display: flex; align-items: center; gap: 10px; letter-spacing: -.01em;
+
+  /* ---------- header ---------- */
+  .hero { text-align: center; margin: 8px 0 26px; }
+  .hero h1 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: 2.3rem; line-height: 1.05; letter-spacing: -.01em;
+    margin: 0 0 8px; font-optical-sizing: auto;
   }
-  h2 .n {
-    flex: none; width: 26px; height: 26px; border-radius: 50%;
-    background: var(--accent-soft); color: var(--accent);
-    font-size: .85rem; font-weight: 700;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
-  .sub { color: var(--muted); font-size: 0.9rem; margin: 0 0 20px; }
+  .tagline { color: var(--muted); font-size: .95rem; margin: 0 auto; max-width: 340px; }
+
+  /* ---------- cards ---------- */
   .card {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: 22px;
     margin-bottom: 16px;
     box-shadow: var(--shadow);
-    animation: rise .35s ease both;
+    animation: rise .4s cubic-bezier(.2,.7,.3,1) both;
   }
-  @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .card-head h2 {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 1.3rem; letter-spacing: -.01em; margin: 0;
+  }
+  .step {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--clay-soft); color: var(--clay-deep);
+    font-family: var(--serif); font-weight: 600; font-size: .95rem;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .hint { color: var(--muted); font-size: .88rem; margin: 0 0 16px; }
+  .hint.center { text-align: center; }
+
+  /* ---------- buttons ---------- */
   button {
-    font: inherit; font-weight: 500;
-    border: none;
-    border-radius: 12px;
-    padding: 0 18px;
-    min-height: var(--tap);
-    cursor: pointer;
-    background: var(--card2);
-    color: var(--text);
-    transition: transform .08s ease, filter .15s ease, background .15s ease;
+    font-family: var(--sans); font-size: .95rem; font-weight: 600;
+    border: none; border-radius: 13px; padding: 0 20px; min-height: var(--tap);
+    cursor: pointer; background: var(--soft); color: var(--ink);
+    transition: transform .08s ease, filter .18s ease, background .18s ease, border-color .18s ease;
   }
-  button:hover { filter: brightness(.98); }
-  button:active { transform: scale(.96); }
-  button.primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; box-shadow: 0 4px 12px rgba(79,110,247,.30); }
-  button.primary:hover { filter: brightness(1.05); }
-  button.green { background: var(--accent2); color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(18,183,106,.25); }
-  button.ghost { background: transparent; border: 1.5px solid var(--line); color: var(--text); }
-  button.ghost:hover { background: var(--card2); }
-  button.tiny { min-height: 36px; padding: 0 10px; font-size: 1rem; }
-  input, select {
-    font: inherit;
-    background: #fff;
-    border: 1.5px solid var(--line);
-    color: var(--text);
-    border-radius: 12px;
-    padding: 0 14px;
-    min-height: var(--tap);
-    width: 100%;
+  button:active { transform: scale(.97); }
+  .primary { background: var(--ink); color: var(--paper); }
+  .primary:hover { filter: brightness(1.12); }
+  .ghost { background: transparent; border: 1.5px solid var(--line); color: var(--ink); }
+  .ghost:hover { background: var(--soft); }
+  .block { width: 100%; }
+  .tiny { min-height: 38px; padding: 0 14px; font-size: .85rem; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .actions button { flex: 1; min-width: 140px; }
+
+  /* ---------- inputs ---------- */
+  input {
+    font-family: var(--sans); font-size: 1rem;
+    background: #fffefb; border: 1.5px solid var(--line); color: var(--ink);
+    border-radius: 13px; padding: 0 15px; min-height: var(--tap); width: 100%;
   }
-  input::placeholder { color: #aab3c0; }
-  input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  label { font-size: 0.8rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; }
-  .row { display: flex; gap: 10px; align-items: center; }
-  .grow { flex: 1; }
-  .muted { color: var(--muted); }
-  .hidden { display: none; }
+  input::placeholder { color: #b9ac9b; }
+  input:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 4px var(--clay-soft); }
+  label { font-size: .78rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 7px; letter-spacing: .02em; }
+
+  /* ---------- scan preview + ocr ---------- */
+  .preview {
+    display: flex; align-items: center; gap: 14px;
+    margin-top: 16px; padding: 12px; border: 1px solid var(--line);
+    border-radius: 16px; background: var(--soft);
+  }
+  .preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 11px; flex: none; border: 1px solid var(--line); }
+  .preview .pv-text { flex: 1; font-size: .85rem; color: var(--muted); }
+  .ocr { margin-top: 16px; }
+  .ocr-text { font-size: .88rem; color: var(--muted); margin-bottom: 10px; }
+  .progress { height: 7px; background: var(--soft); border-radius: 999px; overflow: hidden; }
+  .progress > div { height: 100%; background: var(--clay); width: 0%; transition: width .25s ease; }
+
+  /* ---------- people ---------- */
+  .add-person { display: flex; gap: 10px; margin-bottom: 16px; }
+  .add-person input { flex: 1; }
+  .add-person button { flex: none; }
+  .people { display: flex; flex-wrap: wrap; gap: 9px; }
+  .ptag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1.5px solid var(--line);
+    border-radius: 999px; padding: 5px 6px 5px 6px;
+  }
+  .ptag .pname { font-size: .92rem; font-weight: 500; }
+  .ptag .x {
+    min-height: auto; width: 26px; height: 26px; padding: 0; border-radius: 50%;
+    background: transparent; color: var(--muted); font-size: 1.15rem; line-height: 1; display: grid; place-items: center;
+  }
+  .ptag .x:hover { background: var(--clay-soft); color: var(--danger); }
+  .avatar {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff8ef; font-size: .8rem; font-weight: 600; letter-spacing: .01em;
+  }
+
+  /* ---------- items ---------- */
   .item {
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 12px;
-    background: var(--card2);
-    animation: rise .25s ease both;
+    border: 1px solid var(--line); border-radius: 16px;
+    padding: 15px; margin-bottom: 12px; background: var(--card);
+    animation: rise .28s ease both;
   }
-  .item-top { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
-  .item-top input[type=text] { flex: 1; background: #fff; }
-  .item-top input[type=number] { width: 96px; background: #fff; text-align: right; }
+  .item-head { display: flex; gap: 9px; align-items: center; }
+  .item-head .name { flex: 1; }
+  .price-wrap { position: relative; width: 104px; flex: none; }
+  .price-wrap .cur { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .price-wrap input { padding-left: 26px; text-align: right; }
+  .price-wrap input.review { border-color: var(--clay); background: var(--clay-soft); }
+  .del { min-height: 44px; width: 44px; padding: 0; flex: none; background: transparent; color: var(--muted); font-size: 1.1rem; }
+  .del:hover { background: var(--clay-soft); color: var(--danger); }
+  .review-tag { display: inline-block; margin-top: 9px; font-size: .76rem; color: var(--clay-deep); background: var(--clay-soft); padding: 3px 10px; border-radius: 999px; font-weight: 600; }
+  .assign { margin-top: 13px; padding-top: 13px; border-top: 1px dashed var(--line); }
+  .assign-label { font-size: .76rem; font-weight: 600; color: var(--muted); letter-spacing: .02em; margin-bottom: 9px; display: block; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip {
-    padding: 9px 15px;
-    border-radius: 999px;
-    border: 1.5px solid var(--line);
-    font-size: 0.9rem;
-    cursor: pointer;
-    user-select: none;
-    background: #fff;
-    color: var(--muted);
+  .pchip, .chip-everyone {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 14px; border-radius: 999px; font-size: .88rem; font-weight: 500;
+    cursor: pointer; user-select: none; border: 1.5px solid var(--line);
+    background: #fffefb; color: var(--muted);
     transition: transform .08s ease, background .15s ease, color .15s ease, border-color .15s ease;
   }
-  .chip:active { transform: scale(.94); }
-  .chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
-  .person-tag {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: var(--accent-soft); border: 1px solid transparent; color: var(--accent);
-    border-radius: 999px; padding: 7px 6px 7px 14px; font-size: 0.9rem; font-weight: 600;
+  .pchip:active, .chip-everyone:active { transform: scale(.95); }
+  .pchip .pdot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+  .pchip.on { color: #fff8ef; font-weight: 600; }
+  .chip-everyone { font-weight: 600; }
+  .chip-everyone::before { content: "✦"; color: var(--clay); }
+  .chip-everyone.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .chip-everyone.on::before { color: var(--paper); }
+
+  /* ---------- empty states ---------- */
+  .empty { text-align: center; padding: 26px 10px; color: var(--muted); }
+  .empty .em { font-size: 1.8rem; opacity: .7; }
+  .empty p { margin: 8px 0 0; font-size: .9rem; }
+  .empty .lead { color: var(--ink); font-weight: 500; }
+  .soft { color: var(--muted); font-size: .88rem; margin: 4px 0 0; }
+
+  /* ---------- tax / tip ---------- */
+  .tt { display: flex; gap: 16px; flex-wrap: wrap; }
+  .tt .field { flex: 1; min-width: 150px; margin: 0; }
+  .tt .row { display: flex; gap: 9px; }
+  .seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 13px; overflow: hidden; flex: none; }
+  .seg button { border-radius: 0; min-height: var(--tap); background: #fffefb; padding: 0 17px; color: var(--muted); }
+  .seg button.on { background: var(--ink); color: var(--paper); }
+
+  /* ---------- results ---------- */
+  .result-row { display: flex; align-items: center; gap: 13px; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
+  .result-row:last-of-type { border-bottom: none; }
+  .result-main { flex: 1; min-width: 0; }
+  .result-name { font-weight: 600; font-size: 1rem; }
+  .result-break { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+  .result-total { font-family: var(--serif); font-weight: 600; font-size: 1.25rem; }
+  .grand {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-top: 6px; padding-top: 16px; border-top: 1.5px solid var(--line);
   }
-  .person-tag button { min-height: auto; padding: 4px 8px; border-radius: 999px; background: transparent; color: var(--accent); font-size: .8rem; opacity: .7; }
-  .person-tag button:hover { opacity: 1; color: var(--danger); }
-  .totals-row {
-    display: flex; justify-content: space-between; align-items: center; padding: 12px 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .totals-row:last-child { border-bottom: none; }
-  .big { font-size: 1.3rem; font-weight: 700; letter-spacing: -.01em; }
-  .breakdown { font-size: 0.8rem; color: var(--muted); margin-top: 3px; }
-  .progress { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 12px; }
-  .progress > div { height: 100%; background: var(--accent); width: 0%; transition: width .25s ease; }
-  .field { margin-bottom: 12px; }
-  .seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; flex: none; }
-  .seg button { border-radius: 0; min-height: var(--tap); background: #fff; padding: 0 16px; font-weight: 600; color: var(--muted); }
-  .seg button.on { background: var(--accent); color: var(--accent-ink); }
+  .grand .g-label { font-family: var(--serif); font-size: 1.25rem; font-weight: 500; }
+  .grand .g-amt { font-family: var(--serif); font-size: 1.9rem; font-weight: 600; color: var(--clay-deep); letter-spacing: -.01em; }
   .warn {
-    color: #92400e; background: #fef3c7; border: 1px solid #fde68a;
-    font-size: 0.85rem; border-radius: 12px; padding: 10px 12px; margin: 14px 0 0;
+    color: #7a3b1f; background: var(--clay-soft); border: 1px solid #e8c6b3;
+    font-size: .85rem; border-radius: 13px; padding: 11px 14px; margin: 16px 0 0;
   }
-  .stack > * + * { margin-top: 8px; }
+
+  /* ---------- footer ---------- */
   .footer {
     display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px;
-    color: var(--muted); font-size: 0.8rem; text-align: center;
-    margin: 4px 4px 8px; animation: rise .35s ease both;
+    color: var(--muted); font-size: .8rem; text-align: center; margin: 6px 4px 8px;
+    animation: rise .4s ease both;
   }
-  .footer strong { color: var(--text); }
+  .footer strong { color: var(--ink); }
   .footer .dot { opacity: .5; }
-  /* sticky running-total bar */
+
+  /* ---------- sticky total ---------- */
   .sticky-bar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
-    background: rgba(255,255,255,.85); backdrop-filter: saturate(180%) blur(12px);
+    background: rgba(244,238,228,.85); backdrop-filter: saturate(180%) blur(14px);
     border-top: 1px solid var(--line);
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-    box-shadow: 0 -4px 24px rgba(16,32,56,.07);
+    padding: 13px 18px calc(13px + env(safe-area-inset-bottom));
+    box-shadow: 0 -6px 28px rgba(60,44,30,.07);
   }
-  .sticky-inner {
-    max-width: 640px; margin: 0 auto;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .sticky-inner .lbl { font-size: .8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  .sticky-inner .amt { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+  .sticky-inner { max-width: 600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+  .sticky-inner .lbl { font-size: .76rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .sticky-inner .amt { font-family: var(--serif); font-size: 1.6rem; font-weight: 600; color: var(--ink); }
+
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <h1>🧾 Split the Bill</h1>
-  <p class="sub" style="margin-bottom:0;">Scan a receipt, assign items to people, and split tax &amp; tip proportionally.</p>
-</div>
+<header class="hero">
+  <h1>Split the Bill</h1>
+  <p class="tagline">Scan a receipt, assign each item, and split tax &amp; tip in fair proportion.</p>
+</header>
 
-<!-- STEP 1: SCAN -->
-<div class="card">
-  <h2><span class="n">1</span> Scan or add items</h2>
-  <div class="row" style="flex-wrap:wrap; gap:10px;">
-    <label class="primary" style="display:inline-block;">
-      <button class="primary" type="button" onclick="document.getElementById('file').click()">📷 Scan receipt photo</button>
-    </label>
-    <button class="ghost" type="button" onclick="addItem()">+ Add item manually</button>
+<!-- 1 · ITEMS -->
+<section class="card">
+  <div class="card-head"><span class="step">1</span><h2>Add items</h2></div>
+  <p class="hint">Snap your receipt and we'll read the lines — or add them by hand.</p>
+  <div class="actions">
+    <button class="primary" type="button" onclick="pickFile()">Scan receipt</button>
+    <button class="ghost" type="button" onclick="addItem()">Add manually</button>
   </div>
   <input id="file" type="file" accept="image/*" capture="environment" class="hidden" onchange="runOCR(this.files[0])" />
-  <div id="ocrStatus" class="hidden" style="margin-top:12px;">
-    <div class="muted" id="ocrText">Reading receipt…</div>
+  <div id="preview" class="preview hidden">
+    <img id="previewImg" alt="Receipt photo" />
+    <span class="pv-text" id="previewText">Reading your receipt…</span>
+    <button class="ghost tiny" type="button" onclick="pickFile()">Replace</button>
+  </div>
+  <div id="ocrStatus" class="ocr hidden">
+    <div class="ocr-text" id="ocrText">Reading receipt…</div>
     <div class="progress"><div id="ocrBar"></div></div>
   </div>
-  <p class="sub" style="margin-top:12px; margin-bottom:0;">Tip: OCR is a starting point — always check the prices it pulls in and fix anything that's off.</p>
-</div>
+</section>
 
-<!-- STEP 2: PEOPLE -->
-<div class="card">
-  <h2><span class="n">2</span> Who's splitting?</h2>
-  <div class="row" style="margin-bottom:12px;">
-    <input id="personName" class="grow" type="text" placeholder="Add a name…" onkeydown="if(event.key==='Enter')addPerson()" />
-    <button class="green" type="button" onclick="addPerson()">Add</button>
+<!-- 2 · PEOPLE -->
+<section class="card">
+  <div class="card-head"><span class="step">2</span><h2>Add people</h2></div>
+  <div class="add-person">
+    <input id="personName" type="text" placeholder="Add a name…" onkeydown="if(event.key==='Enter')addPerson()" />
+    <button class="primary" type="button" onclick="addPerson()">Add</button>
   </div>
-  <div id="peopleList" class="chips"></div>
-</div>
+  <div id="peopleList" class="people"></div>
+</section>
 
-<!-- STEP 3: ITEMS -->
-<div class="card">
-  <h2><span class="n">3</span> Assign items</h2>
-  <p class="sub" style="margin-top:-6px;">Tap names under each item to mark who shared it. Cost splits evenly among them.</p>
+<!-- 3 · ASSIGN -->
+<section class="card">
+  <div class="card-head"><span class="step">3</span><h2>Assign items</h2></div>
+  <p class="hint">Tap who shared each item — the cost splits evenly between them.</p>
   <div id="itemsList"></div>
-  <button class="ghost" type="button" onclick="addItem()" style="margin-top:4px;">+ Add item</button>
-</div>
+</section>
 
-<!-- STEP 4: TAX & TIP -->
-<div class="card">
-  <h2><span class="n">4</span> Tax &amp; tip</h2>
-  <div class="row" style="gap:16px; flex-wrap:wrap;">
-    <div class="field grow" style="min-width:130px;">
+<!-- 4 · TAX & TIP -->
+<section class="card">
+  <div class="card-head"><span class="step">4</span><h2>Tax &amp; tip</h2></div>
+  <div class="tt">
+    <div class="field">
       <label>Tax</label>
       <div class="row">
-        <input id="taxVal" type="number" min="0" step="0.01" value="0" oninput="render()" />
+        <input id="taxVal" type="number" inputmode="decimal" min="0" step="0.01" value="0" oninput="render()" />
         <div class="seg" id="taxSeg">
           <button type="button" class="on" onclick="setMode('tax','amount',this)">$</button>
           <button type="button" onclick="setMode('tax','percent',this)">%</button>
         </div>
       </div>
     </div>
-    <div class="field grow" style="min-width:130px;">
+    <div class="field">
       <label>Tip</label>
       <div class="row">
-        <input id="tipVal" type="number" min="0" step="0.01" value="0" oninput="render()" />
+        <input id="tipVal" type="number" inputmode="decimal" min="0" step="0.01" value="0" oninput="render()" />
         <div class="seg" id="tipSeg">
           <button type="button" class="on" onclick="setMode('tip','amount',this)">$</button>
           <button type="button" onclick="setMode('tip','percent',this)">%</button>
@@ -244,22 +309,21 @@
       </div>
     </div>
   </div>
-  <p class="sub" style="margin-bottom:0; margin-top:6px;">Percentages are taken on each person's share of the items subtotal.</p>
-</div>
+  <p class="hint" style="margin:14px 0 0;">Each person's tax &amp; tip match their share of the items.</p>
+</section>
 
-<!-- RESULTS -->
-<div class="card">
-  <h2><span class="n">5</span> Who owes what</h2>
+<!-- 5 · RESULTS -->
+<section class="card">
+  <div class="card-head"><span class="step">5</span><h2>The split</h2></div>
   <div id="results"></div>
-  <div class="totals-row" style="margin-top:6px; border-top:1.5px solid var(--line); padding-top:14px;">
-    <span class="big">Grand total</span>
-    <span class="big" id="grandTotal">$0.00</span>
+  <div class="grand">
+    <span class="g-label">Total</span>
+    <span class="g-amt" id="grandTotal">$0.00</span>
   </div>
-  <button class="primary" id="shareBtn" type="button" onclick="shareSummary()"
-          style="width:100%; margin-top:16px;">📷 Save / share summary</button>
-  <p class="sub" style="text-align:center; margin:8px 0 0;">Send the image to Venmo, Splitwise, or your group chat.</p>
+  <button class="primary block" id="shareBtn" type="button" onclick="shareSummary()" style="margin-top:18px;">Save / share summary</button>
+  <p class="hint center" style="margin:10px 0 0;">Send the image to Venmo, Splitwise, or your group chat.</p>
   <p id="unassignedWarn" class="warn hidden"></p>
-</div>
+</section>
 
 <footer id="footer" class="footer hidden">
   <span>👀 <strong id="visitCount">—</strong> visits</span>
@@ -267,28 +331,33 @@
   <span>Built with Claude · nothing you enter is saved</span>
 </footer>
 
-<!-- sticky running total -->
 <div class="sticky-bar">
   <div class="sticky-inner">
-    <span class="lbl">Grand total</span>
+    <span class="lbl">Total</span>
     <span class="amt" id="stickyTotal">$0.00</span>
   </div>
 </div>
 
 <script>
-let people = [];      // [{id, name}]
-let items = [];       // [{id, name, price, assigned:Set(personId)}]
+let people = [];   // [{id, name, color}]
+let items = [];    // [{id, name, price, assigned:Set, review}]
 let taxMode = 'amount', tipMode = 'amount';
 let pid = 1, iid = 1;
+const PALETTE = ['#c06a4a','#b58a3e','#7d8a5c','#a96a6a','#5f7a78','#8a6a9c','#c98a5e','#6b8e9e'];
 
 function uid(p){ return p==='person' ? 'p'+(pid++) : 'i'+(iid++); }
+function initials(name){
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if(parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return (name.trim().slice(0,2) || '?').toUpperCase();
+}
 
 /* ---------- PEOPLE ---------- */
 function addPerson(){
   const input = document.getElementById('personName');
   const name = input.value.trim();
   if(!name) return;
-  people.push({ id: uid('person'), name });
+  people.push({ id: uid('person'), name, color: PALETTE[people.length % PALETTE.length] });
   input.value = '';
   input.focus();
   render();
@@ -300,23 +369,30 @@ function removePerson(id){
 }
 
 /* ---------- ITEMS ---------- */
-function addItem(name='', price=0){
-  items.push({ id: uid('item'), name, price: +price || 0, assigned: new Set() });
+function addItem(name='', price=0, review=false){
+  items.push({ id: uid('item'), name, price: +price || 0, assigned: new Set(), review });
   render();
 }
 function removeItem(id){ items = items.filter(it => it.id !== id); render(); }
 function updateItem(id, field, val){
   const it = items.find(i => i.id === id);
   if(!it) return;
-  if(field === 'price') it.price = parseFloat(val) || 0;
+  if(field === 'price'){ it.price = parseFloat(val) || 0; it.review = false; }
   else it.name = val;
-  // don't full re-render on text typing (keeps focus); only recompute totals
-  computeAndShowResults();
+  computeAndShowResults();   // live totals without losing input focus
 }
 function toggleAssign(itemId, personId){
   const it = items.find(i => i.id === itemId);
   if(!it) return;
   it.assigned.has(personId) ? it.assigned.delete(personId) : it.assigned.add(personId);
+  render();
+}
+function assignAll(itemId){
+  const it = items.find(i => i.id === itemId);
+  if(!it || !people.length) return;
+  const allOn = people.every(p => it.assigned.has(p.id));
+  if(allOn) it.assigned.clear();
+  else people.forEach(p => it.assigned.add(p.id));
   render();
 }
 
@@ -327,55 +403,56 @@ function setMode(which, mode, btn){
   btn.classList.add('on');
   render();
 }
-// highlight the $ (index 0) or % (index 1) button of a segment programmatically
 function syncSeg(segId, index){
   const seg = document.getElementById(segId);
   [...seg.children].forEach((b,i) => b.classList.toggle('on', i === index));
 }
 
 /* ---------- OCR ---------- */
+function pickFile(){ document.getElementById('file').click(); }
+
 async function runOCR(file){
   if(!file) return;
   const status = document.getElementById('ocrStatus');
   const bar = document.getElementById('ocrBar');
   const txt = document.getElementById('ocrText');
+  const preview = document.getElementById('preview');
+  const previewImg = document.getElementById('previewImg');
+  const previewText = document.getElementById('previewText');
+
+  previewImg.src = URL.createObjectURL(file);
+  preview.classList.remove('hidden');
+  previewText.textContent = 'Reading your receipt…';
   status.classList.remove('hidden');
   txt.textContent = 'Reading receipt…';
   bar.style.width = '5%';
+
   try {
     const { data } = await Tesseract.recognize(file, 'eng', {
-      logger: m => {
-        if(m.status === 'recognizing text') bar.style.width = (m.progress*100).toFixed(0)+'%';
-      }
+      logger: m => { if(m.status === 'recognizing text') bar.style.width = (m.progress*100).toFixed(0)+'%'; }
     });
     const { items: found, tax, tip } = parseReceipt(data.text);
-    found.forEach(f => addItem(f.name, f.price));
+    found.forEach(f => addItem(f.name, f.price, true));
 
-    // auto-fill tax & tip if the receipt had them (as dollar amounts)
     const notes = [];
-    if(tax != null){
-      taxMode = 'amount'; syncSeg('taxSeg', 0);
-      document.getElementById('taxVal').value = tax.toFixed(2);
-      notes.push(`tax ${money(tax)}`);
-    }
-    if(tip != null){
-      tipMode = 'amount'; syncSeg('tipSeg', 0);
-      document.getElementById('tipVal').value = tip.toFixed(2);
-      notes.push(`tip ${money(tip)}`);
-    }
+    if(tax != null){ taxMode = 'amount'; syncSeg('taxSeg', 0); document.getElementById('taxVal').value = tax.toFixed(2); notes.push(`tax ${money(tax)}`); }
+    if(tip != null){ tipMode = 'amount'; syncSeg('tipSeg', 0); document.getElementById('tipVal').value = tip.toFixed(2); notes.push(`tip ${money(tip)}`); }
     render();
 
-    if(found.length || notes.length){
-      let msg = found.length ? `Found ${found.length} item(s)` : 'No line items read';
-      if(notes.length) msg += ` plus ${notes.join(' & ')}`;
-      txt.textContent = msg + '. Please double-check everything below.';
-    } else {
-      txt.textContent = 'Couldn’t read this receipt automatically — add items manually below.';
-    }
     bar.style.width = '100%';
-    setTimeout(() => status.classList.add('hidden'), 3500);
+    if(found.length || notes.length){
+      let msg = found.length ? `Found ${found.length} item${found.length>1?'s':''}` : 'No items read';
+      if(notes.length) msg += ` plus ${notes.join(' & ')}`;
+      txt.textContent = msg + '. Double-check the highlighted prices below.';
+      previewText.textContent = 'Scanned — please review the items below.';
+    } else {
+      txt.textContent = 'Couldn’t read this receipt automatically — add items by hand below.';
+      previewText.textContent = 'Couldn’t read it — try a clearer photo or add by hand.';
+    }
+    setTimeout(() => status.classList.add('hidden'), 4000);
   } catch(e){
-    txt.textContent = 'OCR failed to load (need internet for the first scan). Add items manually.';
+    txt.textContent = 'OCR needs internet for the first scan. Add items by hand below.';
+    previewText.textContent = 'Scan unavailable — add items by hand.';
     console.error(e);
   }
 }
@@ -384,7 +461,6 @@ async function runOCR(file){
 function parseReceipt(text){
   const out = [];
   let tax = null, tip = null;
-  // lines we never treat as a food item
   const skip = /\b(subtotal|sub total|total|tax|tip|gratuity|service|balance|change|cash|visa|master|amex|card|auth|tender|due|amount)\b/i;
   const lastMoney = raw => {
     const m = raw.match(/\d{1,4}[.,]\d{2}/g);
@@ -396,16 +472,11 @@ function parseReceipt(text){
     const raw = line.trim();
     if(!raw) return;
     const val = lastMoney(raw);
-    // capture tax / tip amounts (skip "subtotal", and tax % rate lines like "Tax 8.25%")
-    if(/\b(tax)\b/i.test(raw) && !/sub\s*total/i.test(raw) && val && !/%/.test(raw)){
-      tax = (tax || 0) + val; return;
-    }
-    if(/\b(tip|gratuity|service charge)\b/i.test(raw) && val && !/%/.test(raw)){
-      tip = (tip || 0) + val; return;
-    }
+    if(/\b(tax)\b/i.test(raw) && !/sub\s*total/i.test(raw) && val && !/%/.test(raw)){ tax = (tax || 0) + val; return; }
+    if(/\b(tip|gratuity|service charge)\b/i.test(raw) && val && !/%/.test(raw)){ tip = (tip || 0) + val; return; }
     if(skip.test(raw) || !val) return;
     let name = raw.replace(/\$?\s*\d{1,4}[.,]\d{2}\s*$/,'').replace(/[\s.\-_]+$/,'').trim();
-    name = name.replace(/^\d+\s*[xX]?\s*/, ''); // strip leading qty
+    name = name.replace(/^\d+\s*[xX]?\s*/, '');
     if(name.length < 2) name = 'Item';
     out.push({ name, price: val });
   });
@@ -414,7 +485,6 @@ function parseReceipt(text){
 
 /* ---------- CALCULATION ---------- */
 function compute(){
-  // per-person items subtotal
   const sub = {};
   people.forEach(p => sub[p.id] = 0);
   let itemsTotal = 0, unassignedTotal = 0;
@@ -432,66 +502,80 @@ function compute(){
   const taxTotal = taxMode === 'percent' ? itemsTotal * taxVal/100 : taxVal;
   const tipTotal = tipMode === 'percent' ? itemsTotal * tipVal/100 : tipVal;
 
-  // distribute tax + tip proportionally to each person's share of items
   const result = people.map(p => {
     const share = itemsTotal > 0 ? sub[p.id] / itemsTotal : 0;
-    const tax = taxTotal * share;
-    const tip = tipTotal * share;
+    const tax = taxTotal * share, tip = tipTotal * share;
     return { ...p, items: sub[p.id], tax, tip, total: sub[p.id] + tax + tip };
   });
 
-  return { result, itemsTotal, taxTotal, tipTotal, unassignedTotal,
-           grand: itemsTotal + taxTotal + tipTotal };
+  return { result, itemsTotal, taxTotal, tipTotal, unassignedTotal, grand: itemsTotal + taxTotal + tipTotal };
 }
-
 function money(n){ return '$' + (n || 0).toFixed(2); }
 
 /* ---------- RENDER ---------- */
 function render(){
-  // people chips
+  // people
   const pl = document.getElementById('peopleList');
   pl.innerHTML = people.length
-    ? people.map(p => `<span class="person-tag">${esc(p.name)}<button onclick="removePerson('${p.id}')" title="Remove">✕</button></span>`).join('')
-    : '<span class="muted">No one added yet.</span>';
+    ? people.map(p => `<span class="ptag">
+        <span class="avatar" style="background:${p.color}">${esc(initials(p.name))}</span>
+        <span class="pname">${esc(p.name)}</span>
+        <button class="x" type="button" onclick="removePerson('${p.id}')" aria-label="Remove ${esc(p.name)}">×</button>
+      </span>`).join('')
+    : '<p class="soft">No one yet — add the people splitting this bill.</p>';
 
   // items
   const il = document.getElementById('itemsList');
   if(!items.length){
-    il.innerHTML = '<p class="muted">No items yet — scan a receipt or add one.</p>';
+    il.innerHTML = `<div class="empty"><div class="em">🧾</div>
+      <p class="lead">No items yet</p>
+      <p>Scan a receipt above, or add one by hand.</p></div>`;
   } else {
-    il.innerHTML = items.map(it => `
-      <div class="item">
-        <div class="item-top">
-          <input type="text" value="${esc(it.name)}" placeholder="Item name"
-                 oninput="updateItem('${it.id}','name',this.value)" />
-          <input type="number" min="0" step="0.01" value="${it.price}"
-                 oninput="updateItem('${it.id}','price',this.value)" />
-          <button class="tiny ghost" onclick="removeItem('${it.id}')" title="Delete">🗑</button>
+    il.innerHTML = items.map(it => {
+      const allOn = people.length && people.every(p => it.assigned.has(p.id));
+      const chips = people.length
+        ? `<span class="chip-everyone ${allOn?'on':''}" onclick="assignAll('${it.id}')">Everyone</span>` +
+          people.map(p => {
+            const on = it.assigned.has(p.id);
+            return `<span class="pchip ${on?'on':''}" style="${on?`background:${p.color};border-color:${p.color}`:''}" onclick="toggleAssign('${it.id}','${p.id}')">${on?'':`<span class="pdot" style="background:${p.color}"></span>`}${esc(p.name)}</span>`;
+          }).join('')
+        : '<p class="soft" style="margin:0;">Add people above, then assign them here.</p>';
+      return `<div class="item">
+        <div class="item-head">
+          <input class="name" type="text" value="${esc(it.name)}" placeholder="Item name" oninput="updateItem('${it.id}','name',this.value)" />
+          <div class="price-wrap">
+            <span class="cur">$</span>
+            <input class="${it.review?'review':''}" type="number" inputmode="decimal" min="0" step="0.01" value="${it.price}"
+                   oninput="updateItem('${it.id}','price',this.value)" onchange="render()" />
+          </div>
+          <button class="del" type="button" onclick="removeItem('${it.id}')" aria-label="Delete item">✕</button>
         </div>
-        <div class="chips">
-          ${people.length
-            ? people.map(p => `<span class="chip ${it.assigned.has(p.id)?'on':''}"
-                 onclick="toggleAssign('${it.id}','${p.id}')">${esc(p.name)}</span>`).join('')
-            : '<span class="muted" style="font-size:.8rem;">Add people above to assign.</span>'}
+        ${it.review ? '<span class="review-tag">scanned · check price</span>' : ''}
+        <div class="assign">
+          <span class="assign-label">SHARED BY</span>
+          <div class="chips">${chips}</div>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }
   computeAndShowResults();
 }
 
 function computeAndShowResults(){
-  const { result, itemsTotal, taxTotal, tipTotal, unassignedTotal, grand } = compute();
+  const { result, unassignedTotal, grand } = compute();
   const res = document.getElementById('results');
   res.innerHTML = people.length
-    ? result.map(r => `
-        <div class="totals-row">
-          <div>
-            <div>${esc(r.name)}</div>
-            <div class="breakdown">items ${money(r.items)} · tax ${money(r.tax)} · tip ${money(r.tip)}</div>
-          </div>
-          <div class="big">${money(r.total)}</div>
-        </div>`).join('')
-    : '<p class="muted">Add people to see the split.</p>';
+    ? result.map(r => `<div class="result-row">
+        <span class="avatar" style="background:${r.color}">${esc(initials(r.name))}</span>
+        <div class="result-main">
+          <div class="result-name">${esc(r.name)}</div>
+          <div class="result-break">items ${money(r.items)} · tax ${money(r.tax)} · tip ${money(r.tip)}</div>
+        </div>
+        <div class="result-total">${money(r.total)}</div>
+      </div>`).join('')
+    : `<div class="empty"><div class="em">🧮</div>
+        <p class="lead">Add people to see the split</p>
+        <p>Everyone's share appears here.</p></div>`;
 
   document.getElementById('grandTotal').textContent = money(grand);
   document.getElementById('stickyTotal').textContent = money(grand);
@@ -499,7 +583,7 @@ function computeAndShowResults(){
   const warn = document.getElementById('unassignedWarn');
   if(unassignedTotal > 0.001){
     warn.classList.remove('hidden');
-    warn.textContent = `⚠️ ${money(unassignedTotal)} of items aren't assigned to anyone — that amount isn't included in the split.`;
+    warn.textContent = `${money(unassignedTotal)} of items aren't assigned to anyone yet — that amount isn't in the split.`;
   } else {
     warn.classList.add('hidden');
   }
@@ -508,7 +592,8 @@ function computeAndShowResults(){
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ---------- SHAREABLE SUMMARY IMAGE ---------- */
-const FONT = '-apple-system, Helvetica, Arial, sans-serif';
+const C_SERIF = `Georgia, 'Times New Roman', serif`;
+const C_SANS = `-apple-system, Helvetica, Arial, sans-serif`;
 function roundRect(ctx, x, y, w, h, r){
   ctx.beginPath();
   ctx.moveTo(x+r, y);
@@ -522,58 +607,62 @@ function hline(ctx, x1, x2, y){ ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x
 
 function buildSummaryCanvas(){
   const { result, grand } = compute();
-  const scale = 2, W = 680, pad = 28, cx = pad + 32, cr = W - pad - 32;
-  const H = 242 + result.length * 62;
+  const scale = 2, W = 680, pad = 26, cx = pad + 34, cr = W - pad - 34;
+  const H = 248 + result.length * 64;
   const canvas = document.createElement('canvas');
-  canvas.width = W * scale; canvas.height = H * scale;
+  canvas.width = W*scale; canvas.height = H*scale;
   const ctx = canvas.getContext('2d');
   ctx.scale(scale, scale);
   ctx.textBaseline = 'alphabetic';
 
-  // page background + card
-  ctx.fillStyle = '#eef1f6'; ctx.fillRect(0, 0, W, H);
-  roundRect(ctx, pad, pad, W - pad*2, H - pad*2, 22);
-  ctx.fillStyle = '#ffffff'; ctx.fill();
-  ctx.strokeStyle = '#e4e8ef'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.fillStyle = '#f4eee4'; ctx.fillRect(0, 0, W, H);
+  roundRect(ctx, pad, pad, W-pad*2, H-pad*2, 22);
+  ctx.fillStyle = '#fffdf9'; ctx.fill();
+  ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1; ctx.stroke();
 
   let dateStr = '';
   try { dateStr = new Date().toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }); } catch(e){}
 
-  let y = pad + 36;
-  ctx.fillStyle = '#16202e'; ctx.font = `700 28px ${FONT}`;
-  ctx.fillText('🧾  Split the Bill', cx, y);
-  ctx.fillStyle = '#74808f'; ctx.font = `500 15px ${FONT}`;
+  let y = pad + 40;
+  ctx.fillStyle = '#2c2823'; ctx.font = `600 30px ${C_SERIF}`;
+  ctx.fillText('Split the Bill', cx, y);
+  ctx.fillStyle = '#9a9082'; ctx.font = `400 15px ${C_SANS}`;
   ctx.textAlign = 'right'; ctx.fillText(dateStr, cr, y); ctx.textAlign = 'left';
 
-  y += 26;
-  ctx.fillStyle = '#74808f'; ctx.font = `500 15px ${FONT}`;
-  ctx.fillText('Who owes what', cx, y);
+  y += 24;
+  ctx.fillStyle = '#9a9082'; ctx.font = `400 14px ${C_SANS}`;
+  ctx.fillText('WHO OWES WHAT', cx, y);
 
-  y += 22;
-  ctx.strokeStyle = '#e4e8ef'; ctx.lineWidth = 1; hline(ctx, cx, cr, y);
+  y += 20;
+  ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1; hline(ctx, cx, cr, y);
 
-  y += 14;
+  y += 16;
   result.forEach((r, i) => {
     y += 26;
-    ctx.fillStyle = '#16202e'; ctx.font = `600 22px ${FONT}`;
-    ctx.fillText(r.name, cx, y);
+    // identity dot
+    ctx.beginPath(); ctx.arc(cx + 7, y - 7, 7, 0, Math.PI*2);
+    ctx.fillStyle = r.color; ctx.fill();
+    ctx.fillStyle = '#2c2823'; ctx.font = `600 22px ${C_SANS}`;
+    ctx.fillText(r.name, cx + 24, y);
+    ctx.font = `600 22px ${C_SERIF}`;
     ctx.textAlign = 'right'; ctx.fillText(money(r.total), cr, y); ctx.textAlign = 'left';
     y += 20;
-    ctx.fillStyle = '#74808f'; ctx.font = `400 14px ${FONT}`;
-    ctx.fillText(`items ${money(r.items)}   ·   tax ${money(r.tax)}   ·   tip ${money(r.tip)}`, cx, y);
-    y += 16;
-    if(i < result.length - 1){ ctx.strokeStyle = '#eef1f4'; hline(ctx, cx, cr, y); }
+    ctx.fillStyle = '#9a9082'; ctx.font = `400 14px ${C_SANS}`;
+    ctx.fillText(`items ${money(r.items)}   ·   tax ${money(r.tax)}   ·   tip ${money(r.tip)}`, cx + 24, y);
+    y += 18;
+    if(i < result.length - 1){ ctx.strokeStyle = '#efe7d9'; hline(ctx, cx, cr, y); }
   });
 
-  y += 10;
-  ctx.strokeStyle = '#e4e8ef'; ctx.lineWidth = 1.5; hline(ctx, cx, cr, y);
-  y += 38;
-  ctx.fillStyle = '#16202e'; ctx.font = `800 26px ${FONT}`;
-  ctx.fillText('Grand total', cx, y);
-  ctx.fillStyle = '#4f6ef7'; ctx.textAlign = 'right'; ctx.fillText(money(grand), cr, y); ctx.textAlign = 'left';
+  y += 12;
+  ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1.5; hline(ctx, cx, cr, y);
+  y += 40;
+  ctx.fillStyle = '#2c2823'; ctx.font = `500 26px ${C_SERIF}`;
+  ctx.fillText('Total', cx, y);
+  ctx.fillStyle = '#a85738'; ctx.font = `600 30px ${C_SERIF}`;
+  ctx.textAlign = 'right'; ctx.fillText(money(grand), cr, y); ctx.textAlign = 'left';
 
   y += 40;
-  ctx.fillStyle = '#9aa4b2'; ctx.font = `400 13px ${FONT}`; ctx.textAlign = 'center';
+  ctx.fillStyle = '#b3a896'; ctx.font = `400 13px ${C_SANS}`; ctx.textAlign = 'center';
   ctx.fillText('Tax & tip split proportionally · made with Claude', W/2, y);
   ctx.textAlign = 'left';
 
@@ -594,13 +683,9 @@ async function shareSummary(){
   canvas.toBlob(async blob => {
     if(!blob) return;
     const file = new File([blob], 'bill-split.png', { type: 'image/png' });
-    // On phones: native share sheet (Venmo, Splitwise, Messages…). Elsewhere: download.
     if(navigator.canShare && navigator.canShare({ files: [file] })){
-      try {
-        await navigator.share({ files: [file], title: 'Bill split' });
-      } catch(e){
-        if(e && e.name !== 'AbortError') downloadBlob(blob); // ignore user-cancelled
-      }
+      try { await navigator.share({ files: [file], title: 'Bill split' }); }
+      catch(e){ if(e && e.name !== 'AbortError') downloadBlob(blob); }
     } else {
       downloadBlob(blob);
     }
@@ -609,14 +694,12 @@ async function shareSummary(){
 
 render();
 
-// Register the service worker (makes the app installable + work offline).
-// Only runs over https (e.g. GitHub Pages) — silently skipped when opened as a local file.
+// Register the service worker (installable + offline). https only.
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
-// Privacy-friendly visit counter (Abacus — no cookies, no personal data, just a number).
-// Counts once per browser session; if the service is unreachable the footer stays hidden.
+// Privacy-friendly visit counter (Abacus — no cookies, no personal data).
 (async () => {
   try {
     const counted = sessionStorage.getItem('sb_counted');
@@ -627,7 +710,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     sessionStorage.setItem('sb_counted', '1');
     document.getElementById('visitCount').textContent = (data.value ?? 0).toLocaleString();
     document.getElementById('footer').classList.remove('hidden');
-  } catch (e) { /* counter offline — leave footer hidden, app works fine */ }
+  } catch (e) { /* counter offline — leave footer hidden */ }
 })();
 </script>
 </body>
