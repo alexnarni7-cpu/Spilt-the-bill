@@ -191,9 +191,17 @@
   .soft { color: var(--muted); font-size: .88rem; margin: 4px 0 0; }
 
   /* ---------- tax / tip ---------- */
-  .tt { display: flex; gap: 16px; flex-wrap: wrap; }
-  .tt .field { flex: 1; min-width: 150px; margin: 0; }
+  .tt { display: flex; flex-direction: column; gap: 20px; }
+  .tt .field { margin: 0; }
   .tt .row { display: flex; gap: 9px; }
+  .tt .row input { flex: 1; }
+  .tt-help { font-size: .83rem; color: var(--muted); margin-top: 9px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .tt-help strong { color: var(--ink); font-weight: 600; }
+  .link {
+    min-height: auto; padding: 0; background: transparent; color: var(--clay-deep);
+    font-size: .83rem; font-weight: 600; text-decoration: underline; text-underline-offset: 2px;
+  }
+  .link:hover { color: var(--clay); }
   .seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 13px; overflow: hidden; flex: none; }
   .seg button { border-radius: 0; min-height: var(--tap); background: #fffefb; padding: 0 17px; color: var(--muted); }
   .seg button.on { background: var(--ink); color: var(--paper); }
@@ -297,6 +305,7 @@
           <button type="button" onclick="setMode('tax','percent',this)">%</button>
         </div>
       </div>
+      <div class="tt-help" id="taxHelp"></div>
     </div>
     <div class="field">
       <label>Tip</label>
@@ -307,6 +316,7 @@
           <button type="button" onclick="setMode('tip','percent',this)">%</button>
         </div>
       </div>
+      <div class="tt-help" id="tipHelp"></div>
     </div>
   </div>
   <p class="hint" style="margin:14px 0 0;">Each person's tax &amp; tip match their share of the items.</p>
@@ -406,6 +416,34 @@ function setMode(which, mode, btn){
 function syncSeg(segId, index){
   const seg = document.getElementById(segId);
   [...seg.children].forEach((b,i) => b.classList.toggle('on', i === index));
+}
+function fmtPct(p){
+  if(!isFinite(p)) return '0%';
+  const r = Math.round(p * 10) / 10;
+  return (Number.isInteger(r) ? r.toFixed(0) : r.toFixed(1)) + '%';
+}
+// Show the live $ value for a % (clarifying it's on the pre-tax subtotal),
+// or the equivalent % when a $ amount is entered.
+function setHelp(id, mode, raw, base, total, which){
+  const el = document.getElementById(id);
+  if(mode === 'percent'){
+    el.innerHTML = `${fmtPct(+raw || 0)} of ${money(base)} subtotal = <strong>${money(total)}</strong>`
+      + ` <button type="button" class="link" onclick="adjustToAmount('${which}')">Adjust</button>`;
+  } else {
+    el.innerHTML = total > 0
+      ? `= ${fmtPct(base > 0 ? total/base*100 : 0)} of the ${money(base)} subtotal`
+      : `Enter a dollar amount, or tap % to enter a rate.`;
+  }
+}
+// Convert the current % into an editable dollar amount and switch to $ mode.
+function adjustToAmount(which){
+  const c = compute();
+  const input = document.getElementById(which === 'tax' ? 'taxVal' : 'tipVal');
+  input.value = (which === 'tax' ? c.taxTotal : c.tipTotal).toFixed(2);
+  if(which === 'tax'){ taxMode = 'amount'; syncSeg('taxSeg', 0); }
+  else { tipMode = 'amount'; syncSeg('tipSeg', 0); }
+  render();
+  input.focus(); input.select();
 }
 
 /* ---------- OCR ---------- */
@@ -562,14 +600,23 @@ function render(){
 }
 
 function computeAndShowResults(){
-  const { result, unassignedTotal, grand } = compute();
+  const { result, itemsTotal, taxTotal, tipTotal, unassignedTotal, grand } = compute();
+
+  // tax/tip helper lines (live $ value for a %, or equivalent % for a $)
+  const taxRaw = parseFloat(document.getElementById('taxVal').value) || 0;
+  const tipRaw = parseFloat(document.getElementById('tipVal').value) || 0;
+  setHelp('taxHelp', taxMode, taxRaw, itemsTotal, taxTotal, 'tax');
+  setHelp('tipHelp', tipMode, tipRaw, itemsTotal, tipTotal, 'tip');
+
+  const taxRate = itemsTotal > 0 ? taxTotal/itemsTotal*100 : 0;
+  const tipRate = itemsTotal > 0 ? tipTotal/itemsTotal*100 : 0;
   const res = document.getElementById('results');
   res.innerHTML = people.length
     ? result.map(r => `<div class="result-row">
         <span class="avatar" style="background:${r.color}">${esc(initials(r.name))}</span>
         <div class="result-main">
           <div class="result-name">${esc(r.name)}</div>
-          <div class="result-break">items ${money(r.items)} · tax ${money(r.tax)} · tip ${money(r.tip)}</div>
+          <div class="result-break">items ${money(r.items)} · tax ${fmtPct(taxRate)} ${money(r.tax)} · tip ${fmtPct(tipRate)} ${money(r.tip)}</div>
         </div>
         <div class="result-total">${money(r.total)}</div>
       </div>`).join('')
@@ -606,66 +653,104 @@ function roundRect(ctx, x, y, w, h, r){
 function hline(ctx, x1, x2, y){ ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke(); }
 
 function buildSummaryCanvas(){
-  const { result, grand } = compute();
-  const scale = 2, W = 680, pad = 26, cx = pad + 34, cr = W - pad - 34;
-  const H = 248 + result.length * 64;
-  const canvas = document.createElement('canvas');
-  canvas.width = W*scale; canvas.height = H*scale;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(scale, scale);
-  ctx.textBaseline = 'alphabetic';
-
-  ctx.fillStyle = '#f4eee4'; ctx.fillRect(0, 0, W, H);
-  roundRect(ctx, pad, pad, W-pad*2, H-pad*2, 22);
-  ctx.fillStyle = '#fffdf9'; ctx.fill();
-  ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1; ctx.stroke();
+  const { result, itemsTotal, taxTotal, tipTotal, grand } = compute();
+  const taxRate = itemsTotal > 0 ? taxTotal/itemsTotal*100 : 0;
+  const tipRate = itemsTotal > 0 ? tipTotal/itemsTotal*100 : 0;
+  const scale = 2, W = 700, pad = 26, cx = pad + 30, cr = W - pad - 30;
 
   let dateStr = '';
   try { dateStr = new Date().toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }); } catch(e){}
 
-  let y = pad + 40;
-  ctx.fillStyle = '#2c2823'; ctx.font = `600 30px ${C_SERIF}`;
-  ctx.fillText('Split the Bill', cx, y);
-  ctx.fillStyle = '#9a9082'; ctx.font = `400 15px ${C_SANS}`;
-  ctx.textAlign = 'right'; ctx.fillText(dateStr, cr, y); ctx.textAlign = 'left';
+  const trunc = (ctx, t, maxW) => {
+    if(ctx.measureText(t).width <= maxW) return t;
+    let s = t;
+    while(s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+    return s + '…';
+  };
 
-  y += 24;
-  ctx.fillStyle = '#9a9082'; ctx.font = `400 14px ${C_SANS}`;
-  ctx.fillText('WHO OWES WHAT', cx, y);
+  // Single layout routine: measure pass (draw=false) sizes the canvas exactly,
+  // then the same routine paints (draw=true) so positions always match.
+  function layout(ctx, draw){
+    let y = pad + 38;
+    if(draw){
+      ctx.fillStyle = '#2c2823'; ctx.font = `600 30px ${C_SERIF}`;
+      ctx.fillText('Split the Bill', cx, y);
+      ctx.fillStyle = '#9a9082'; ctx.font = `400 15px ${C_SANS}`;
+      ctx.textAlign = 'right'; ctx.fillText(dateStr, cr, y); ctx.textAlign = 'left';
+    }
 
-  y += 20;
-  ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1; hline(ctx, cx, cr, y);
+    // ITEMS
+    if(items.length){
+      y += 32;
+      if(draw){ ctx.fillStyle = '#9a9082'; ctx.font = `600 13px ${C_SANS}`; ctx.fillText('ITEMS', cx, y); }
+      items.forEach(it => {
+        y += 25;
+        if(draw){
+          ctx.font = `400 15px ${C_SANS}`;
+          ctx.fillStyle = '#6b6256'; ctx.textAlign = 'right';
+          ctx.fillText(money(it.price), cr, y); ctx.textAlign = 'left';
+          ctx.fillStyle = '#3f3a33';
+          ctx.fillText(trunc(ctx, it.name || 'Item', (cr - 95) - cx), cx, y);
+        }
+      });
+      y += 16;
+      if(draw){ ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1; hline(ctx, cx, cr, y); }
+    }
 
-  y += 16;
-  result.forEach((r, i) => {
-    y += 26;
-    // identity dot
-    ctx.beginPath(); ctx.arc(cx + 7, y - 7, 7, 0, Math.PI*2);
-    ctx.fillStyle = r.color; ctx.fill();
-    ctx.fillStyle = '#2c2823'; ctx.font = `600 22px ${C_SANS}`;
-    ctx.fillText(r.name, cx + 24, y);
-    ctx.font = `600 22px ${C_SERIF}`;
-    ctx.textAlign = 'right'; ctx.fillText(money(r.total), cr, y); ctx.textAlign = 'left';
-    y += 20;
-    ctx.fillStyle = '#9a9082'; ctx.font = `400 14px ${C_SANS}`;
-    ctx.fillText(`items ${money(r.items)}   ·   tax ${money(r.tax)}   ·   tip ${money(r.tip)}`, cx + 24, y);
-    y += 18;
-    if(i < result.length - 1){ ctx.strokeStyle = '#efe7d9'; hline(ctx, cx, cr, y); }
-  });
+    // WHO OWES WHAT
+    y += 30;
+    if(draw){ ctx.fillStyle = '#9a9082'; ctx.font = `600 13px ${C_SANS}`; ctx.fillText('WHO OWES WHAT', cx, y); }
+    result.forEach((r, i) => {
+      y += 28;
+      if(draw){
+        ctx.beginPath(); ctx.arc(cx + 7, y - 7, 7, 0, Math.PI*2); ctx.fillStyle = r.color; ctx.fill();
+        ctx.fillStyle = '#2c2823'; ctx.font = `600 21px ${C_SANS}`;
+        ctx.fillText(r.name, cx + 24, y);
+        ctx.font = `600 21px ${C_SERIF}`;
+        ctx.textAlign = 'right'; ctx.fillText(money(r.total), cr, y); ctx.textAlign = 'left';
+      }
+      y += 19;
+      if(draw){
+        ctx.fillStyle = '#9a9082'; ctx.font = `400 13px ${C_SANS}`;
+        ctx.fillText(`items ${money(r.items)}   ·   tax ${fmtPct(taxRate)} ${money(r.tax)}   ·   tip ${fmtPct(tipRate)} ${money(r.tip)}`, cx + 24, y);
+      }
+      y += 17;
+      if(i < result.length - 1 && draw){ ctx.strokeStyle = '#efe7d9'; hline(ctx, cx, cr, y); }
+    });
 
-  y += 12;
-  ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1.5; hline(ctx, cx, cr, y);
-  y += 40;
-  ctx.fillStyle = '#2c2823'; ctx.font = `500 26px ${C_SERIF}`;
-  ctx.fillText('Total', cx, y);
-  ctx.fillStyle = '#a85738'; ctx.font = `600 30px ${C_SERIF}`;
-  ctx.textAlign = 'right'; ctx.fillText(money(grand), cr, y); ctx.textAlign = 'left';
+    // TOTAL
+    y += 12;
+    if(draw){ ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1.5; hline(ctx, cx, cr, y); }
+    y += 38;
+    if(draw){
+      ctx.fillStyle = '#2c2823'; ctx.font = `500 24px ${C_SERIF}`;
+      ctx.fillText('Total', cx, y);
+      ctx.fillStyle = '#a85738'; ctx.font = `600 28px ${C_SERIF}`;
+      ctx.textAlign = 'right'; ctx.fillText(money(grand), cr, y); ctx.textAlign = 'left';
+    }
+    y += 36;
+    if(draw){
+      ctx.fillStyle = '#b3a896'; ctx.font = `400 13px ${C_SANS}`; ctx.textAlign = 'center';
+      ctx.fillText('Tax & tip split proportionally · made with Claude', W/2, y);
+      ctx.textAlign = 'left';
+    }
+    return y;
+  }
 
-  y += 40;
-  ctx.fillStyle = '#b3a896'; ctx.font = `400 13px ${C_SANS}`; ctx.textAlign = 'center';
-  ctx.fillText('Tax & tip split proportionally · made with Claude', W/2, y);
-  ctx.textAlign = 'left';
+  const endY = layout(document.createElement('canvas').getContext('2d'), false);
+  const H = Math.ceil(endY + pad);
 
+  const canvas = document.createElement('canvas');
+  canvas.width = W*scale; canvas.height = H*scale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale); ctx.textBaseline = 'alphabetic';
+
+  ctx.fillStyle = '#f4eee4'; ctx.fillRect(0, 0, W, H);
+  roundRect(ctx, pad, pad, W - pad*2, H - pad*2, 22);
+  ctx.fillStyle = '#fffdf9'; ctx.fill();
+  ctx.strokeStyle = '#e7ddcb'; ctx.lineWidth = 1; ctx.stroke();
+
+  layout(ctx, true);
   return canvas;
 }
 
