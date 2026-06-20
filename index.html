@@ -211,7 +211,14 @@
   .result-row:last-of-type { border-bottom: none; }
   .result-main { flex: 1; min-width: 0; }
   .result-name { font-weight: 600; font-size: 1rem; }
-  .result-break { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+  .result-lines { margin: 6px 0 4px; font-size: .82rem; }
+  .result-lines > div { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; color: var(--ink); }
+  .result-lines .li-name { color: #4f4840; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .result-lines .li-math { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .result-lines .li-sub { margin-top: 3px; padding-top: 4px; border-top: 1px dashed var(--line); font-weight: 600; }
+  .result-lines .li-sub .li-name { color: var(--ink); }
+  .result-lines .li-sub .li-math { color: var(--ink); }
+  .result-break { font-size: .8rem; color: var(--muted); margin-top: 4px; }
   .result-total { font-family: var(--serif); font-weight: 600; font-size: 1.25rem; }
   .grand {
     display: flex; justify-content: space-between; align-items: baseline;
@@ -340,7 +347,7 @@
   <span class="dot">·</span>
   <span>Built with Claude · nothing saved</span>
   <span class="dot">·</span>
-  <span>build 6</span>
+  <span>build 7</span>
 </footer>
 
 <div class="sticky-bar">
@@ -593,8 +600,8 @@ function parseReceipt(text){
 
 /* ---------- CALCULATION ---------- */
 function compute(){
-  const sub = {};
-  people.forEach(p => sub[p.id] = 0);
+  const sub = {}, lines = {};
+  people.forEach(p => { sub[p.id] = 0; lines[p.id] = []; });
   let itemsTotal = 0, unassignedTotal = 0;
 
   items.forEach(it => {
@@ -602,7 +609,10 @@ function compute(){
     const sharers = [...it.assigned].filter(id => people.some(p => p.id === id));
     if(sharers.length === 0){ unassignedTotal += it.price; return; }
     const each = it.price / sharers.length;
-    sharers.forEach(id => sub[id] += each);
+    sharers.forEach(id => {
+      sub[id] += each;
+      lines[id].push({ name: it.name || 'Item', price: it.price, n: sharers.length, amount: each });
+    });
   });
 
   const taxVal = parseFloat(document.getElementById('taxVal').value) || 0;
@@ -613,7 +623,7 @@ function compute(){
   const result = people.map(p => {
     const share = itemsTotal > 0 ? sub[p.id] / itemsTotal : 0;
     const tax = taxTotal * share, tip = tipTotal * share;
-    return { ...p, items: sub[p.id], tax, tip, total: sub[p.id] + tax + tip };
+    return { ...p, items: sub[p.id], lines: lines[p.id], tax, tip, total: sub[p.id] + tax + tip };
   });
 
   return { result, itemsTotal, taxTotal, tipTotal, unassignedTotal, grand: itemsTotal + taxTotal + tipTotal };
@@ -686,7 +696,10 @@ function computeAndShowResults(){
         <span class="avatar" style="background:${r.color}">${esc(initials(r.name))}</span>
         <div class="result-main">
           <div class="result-name">${esc(r.name)}</div>
-          <div class="result-break">items ${money(r.items)} · tax ${fmtPct(taxRate)} ${money(r.tax)} · tip ${fmtPct(tipRate)} ${money(r.tip)}</div>
+          ${r.lines.length ? `<div class="result-lines">${r.lines.map(l =>
+            `<div><span class="li-name">${esc(l.name)}</span><span class="li-math">${l.n > 1 ? `${money(l.price)} ÷ ${l.n} = ` : ''}${money(l.amount)}</span></div>`
+          ).join('')}<div class="li-sub"><span class="li-name">Items subtotal</span><span class="li-math">${money(r.items)}</span></div></div>` : ''}
+          <div class="result-break">items ${money(r.items)} + tax ${fmtPct(taxRate)} ${money(r.tax)} + tip ${fmtPct(tipRate)} ${money(r.tip)}</div>
         </div>
         <div class="result-total">${money(r.total)}</div>
       </div>`).join('')
@@ -779,10 +792,21 @@ function buildSummaryCanvas(){
         ctx.font = `600 21px ${C_SERIF}`;
         ctx.textAlign = 'right'; ctx.fillText(money(r.total), cr, y); ctx.textAlign = 'left';
       }
-      y += 19;
+      // per-item math: each shared item × this person's fraction
+      r.lines.forEach(l => {
+        y += 19;
+        if(draw){
+          ctx.font = `400 13px ${C_SANS}`;
+          const math = (l.n > 1 ? `${money(l.price)} ÷ ${l.n} = ` : '') + money(l.amount);
+          ctx.fillStyle = '#9a9082'; ctx.textAlign = 'right'; ctx.fillText(math, cr, y); ctx.textAlign = 'left';
+          ctx.fillStyle = '#5c544a'; ctx.fillText(trunc(ctx, l.name, (cr - 160) - (cx + 24)), cx + 24, y);
+        }
+      });
+      // subtotal + tax + tip = total
+      y += 20;
       if(draw){
-        ctx.fillStyle = '#9a9082'; ctx.font = `400 13px ${C_SANS}`;
-        ctx.fillText(`items ${money(r.items)}   ·   tax ${fmtPct(taxRate)} ${money(r.tax)}   ·   tip ${fmtPct(tipRate)} ${money(r.tip)}`, cx + 24, y);
+        ctx.fillStyle = '#6b6256'; ctx.font = `600 13px ${C_SANS}`;
+        ctx.fillText(`items ${money(r.items)}  +  tax ${fmtPct(taxRate)} ${money(r.tax)}  +  tip ${fmtPct(tipRate)} ${money(r.tip)}`, cx + 24, y);
       }
       y += 17;
       if(i < result.length - 1 && draw){ ctx.strokeStyle = '#efe7d9'; hline(ctx, cx, cr, y); }
