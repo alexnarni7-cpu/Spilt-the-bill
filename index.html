@@ -71,19 +71,40 @@
     padding: 22px;
     margin-bottom: 16px;
     box-shadow: var(--shadow);
-    animation: rise .4s cubic-bezier(.2,.7,.3,1) both;
+    animation: rise .5s cubic-bezier(.2,.7,.3,1) both;
+    transition: transform .28s ease, box-shadow .28s ease;
   }
-  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
-  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+  /* staggered entrance for the five section cards */
+  .card:nth-of-type(1){ animation-delay: .04s; }
+  .card:nth-of-type(2){ animation-delay: .10s; }
+  .card:nth-of-type(3){ animation-delay: .16s; }
+  .card:nth-of-type(4){ animation-delay: .22s; }
+  .card:nth-of-type(5){ animation-delay: .28s; }
+  @media (hover: hover) {
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(60,44,30,.06), 0 18px 44px rgba(60,44,30,.09); }
+    .card:hover .ico { transform: scale(1.08) rotate(-3deg); }
+  }
+  .card-head { display: flex; align-items: center; gap: 13px; margin-bottom: 6px; }
   .card-head h2 {
     font-family: var(--serif); font-weight: 500;
     font-size: 1.3rem; letter-spacing: -.01em; margin: 0;
   }
+  .ico {
+    flex: none; width: 42px; height: 42px; border-radius: 13px;
+    background: var(--clay-soft); color: var(--clay-deep);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform .28s cubic-bezier(.2,.7,.3,1);
+  }
+  .ico svg { width: 23px; height: 23px; }
   .step {
     flex: none; width: 30px; height: 30px; border-radius: 50%;
     background: var(--clay-soft); color: var(--clay-deep);
     font-family: var(--serif); font-weight: 600; font-size: .95rem;
     display: inline-flex; align-items: center; justify-content: center;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
   .hint { color: var(--muted); font-size: .88rem; margin: 0 0 16px; }
   .hint.center { text-align: center; }
@@ -264,7 +285,7 @@
 
 <!-- 1 · ITEMS -->
 <section class="card">
-  <div class="card-head"><span class="step">1</span><h2>Add items</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3L6 21V3z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><h2>Add items</h2></div>
   <p class="hint">Snap your receipt and we'll read the lines — or add them by hand.</p>
   <div class="actions">
     <button class="primary" type="button" onclick="pickFile()">Scan receipt</button>
@@ -284,7 +305,7 @@
 
 <!-- 2 · PEOPLE -->
 <section class="card">
-  <div class="card-head"><span class="step">2</span><h2>Add people</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3.2"/><path d="M3.5 19c0-3.4 2.7-5.6 6-5.6 1.3 0 2.5.3 3.5 1"/><path d="M18.5 8v5M16 10.5h5"/></svg></span><h2>Add people</h2></div>
   <div class="add-person">
     <input id="personName" type="text" placeholder="Add a name…" onkeydown="if(event.key==='Enter')addPerson()" />
     <button class="primary" type="button" onclick="addPerson()">Add</button>
@@ -294,14 +315,14 @@
 
 <!-- 3 · ASSIGN -->
 <section class="card">
-  <div class="card-head"><span class="step">3</span><h2>Assign items</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12.4 21.6a2 2 0 0 1-2.8 0l-6.2-6.2a2 2 0 0 1 0-2.8L11.6 4.4A2 2 0 0 1 13 3.8l5.6.1a2 2 0 0 1 2 2l.1 5.6a2 2 0 0 1-.7 1.3z"/><circle cx="16.2" cy="7.8" r="1.3"/></svg></span><h2>Assign items</h2></div>
   <p class="hint">Tap who shared each item — the cost splits evenly between them.</p>
   <div id="itemsList"></div>
 </section>
 
 <!-- 4 · TAX & TIP -->
 <section class="card">
-  <div class="card-head"><span class="step">4</span><h2>Tax &amp; tip</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="7.5" cy="7.5" r="2.3"/><circle cx="16.5" cy="16.5" r="2.3"/></svg></span><h2>Tax &amp; tip</h2></div>
   <div class="tt">
     <div class="field">
       <label>Tax</label>
@@ -331,7 +352,7 @@
 
 <!-- 5 · RESULTS -->
 <section class="card">
-  <div class="card-head"><span class="step">5</span><h2>The split</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><circle cx="12" cy="6" r="1.5"/><circle cx="12" cy="18" r="1.5"/></svg></span><h2>The split</h2></div>
   <div id="results"></div>
   <div class="grand">
     <span class="g-label">Total</span>
@@ -347,7 +368,7 @@
   <span class="dot">·</span>
   <span>Built with Claude · nothing saved</span>
   <span class="dot">·</span>
-  <span>build 7</span>
+  <span>build 8</span>
 </footer>
 
 <div class="sticky-bar">
@@ -707,8 +728,8 @@ function computeAndShowResults(){
         <p class="lead">Add people to see the split</p>
         <p>Everyone's share appears here.</p></div>`;
 
-  document.getElementById('grandTotal').textContent = money(grand);
-  document.getElementById('stickyTotal').textContent = money(grand);
+  animateMoney(document.getElementById('grandTotal'), grand);
+  animateMoney(document.getElementById('stickyTotal'), grand);
 
   const warn = document.getElementById('unassignedWarn');
   if(unassignedTotal > 0.001){
@@ -720,6 +741,23 @@ function computeAndShowResults(){
 }
 
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// Smoothly count a money element up/down to a new value (eased). Respects reduced-motion.
+const REDUCED_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+function animateMoney(el, to){
+  const from = parseFloat(el.dataset.val || '0') || 0;
+  el.dataset.val = to;
+  if(REDUCED_MOTION || Math.abs(to - from) < 0.005){ el.textContent = money(to); return; }
+  if(el._raf) cancelAnimationFrame(el._raf);
+  const start = performance.now(), dur = 420;
+  const step = now => {
+    const t = Math.min(1, (now - start) / dur);
+    const e = 1 - Math.pow(1 - t, 3);   // easeOutCubic
+    el.textContent = money(from + (to - from) * e);
+    if(t < 1) el._raf = requestAnimationFrame(step);
+  };
+  el._raf = requestAnimationFrame(step);
+}
 
 /* ---------- SHAREABLE SUMMARY IMAGE ---------- */
 const C_SERIF = `Georgia, 'Times New Roman', serif`;
