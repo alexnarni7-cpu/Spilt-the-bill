@@ -15,58 +15,69 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Split Bill" />
 
-<!-- type -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   :root {
-    --paper: #ffffff;
+    --paper: #f2f2f7;          /* iOS systemGroupedBackground */
     --card: #ffffff;
-    --soft: #f1f1f2;
-    --line: #e5e5e7;
-    --line-soft: #efeff0;
-    --ink: #111113;
-    --muted: #6e6e76;
-    --clay: #b00710;          /* blood red accent */
+    --soft: #e9e9ee;
+    --line: #e3e3e8;
+    --line-soft: #ededf2;
+    --fill: #efeff4;           /* iOS field/segmented fill */
+    --ink: #1c1c1e;            /* iOS label */
+    --muted: #8a8a8e;          /* iOS secondaryLabel */
+    --clay: #b00710;           /* blood red accent (tint) */
     --clay-deep: #8a0008;
-    --clay-soft: #fdeaea;
+    --clay-soft: #fde9ea;
     --pink: #b00710;
     --orange: #b00710;
     --danger: #b00710;
     --grad: #b00710;
     --grad-btn: #b00710;
-    --radius: 22px;
+    --radius: 18px;
     --tap: 50px;
-    --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
-    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.08);
+    --sf: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --serif: var(--sf);
+    --sans: var(--sf);
+    --shadow: 0 1px 3px rgba(0,0,0,.05);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0 auto;
     font-family: var(--sans);
-    background: #ffffff;
+    background: var(--paper);
     color: var(--ink);
-    line-height: 1.5;
-    letter-spacing: .005em;
-    padding: 24px 18px calc(104px + env(safe-area-inset-bottom));
+    line-height: 1.45;
+    letter-spacing: -.01em;
+    padding: 8px 16px calc(104px + env(safe-area-inset-bottom));
     max-width: 600px;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ---------- header ---------- */
-  .hero { text-align: center; margin: 12px 0 28px; }
-  .hero h1 {
-    font-family: var(--serif); font-weight: 600;
-    font-size: 2.5rem; line-height: 1.05; letter-spacing: -.01em;
-    margin: 0 0 8px; font-optical-sizing: auto; color: var(--ink);
+  /* ---------- iOS nav bar (appears on scroll) ---------- */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 16px; padding-top: env(safe-area-inset-top);
+    height: calc(46px + env(safe-area-inset-top));
+    background: rgba(249,249,251,.8); backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: .5px solid rgba(0,0,0,.14);
+    font-size: 1.0625rem; font-weight: 600; color: var(--ink);
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
   }
-  .hero h1 .dot-red { color: var(--clay); }
-  .tagline { color: var(--muted); font-size: .95rem; margin: 0 auto; max-width: 340px; }
+  .navbar.show { opacity: 1; transform: none; }
+
+  /* ---------- header (large title) ---------- */
+  .hero { text-align: left; margin: 16px 2px 22px; }
+  .hero h1 {
+    font-family: var(--sf); font-weight: 700;
+    font-size: 2.125rem; line-height: 1.08; letter-spacing: -.022em;
+    margin: 0 0 5px; color: var(--ink);
+  }
+  .tagline { color: var(--muted); font-size: .95rem; margin: 0; max-width: 380px; }
 
   /* ---------- cards ---------- */
   .card {
@@ -87,23 +98,21 @@
   .card:nth-of-type(4){ animation-delay: .22s; }
   .card:nth-of-type(5){ animation-delay: .28s; }
   @media (hover: hover) {
-    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(60,44,30,.06), 0 18px 44px rgba(60,44,30,.09); }
-    .card:hover .ico { transform: scale(1.08) rotate(-3deg); }
+    .card:hover .ico { transform: scale(1.06); }
   }
-  .card-head { display: flex; align-items: center; gap: 13px; margin-bottom: 6px; }
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
   .card-head h2 {
-    font-family: var(--serif); font-weight: 500;
-    font-size: 1.3rem; letter-spacing: -.01em; margin: 0;
+    font-family: var(--sf); font-weight: 600;
+    font-size: 1.3125rem; letter-spacing: -.015em; margin: 0;
   }
+  /* blood-red rounded icon badge (SF Symbol style) */
   .ico {
-    flex: none; width: 42px; height: 42px; border-radius: 13px;
-    background: var(--clay-soft); color: var(--clay-deep);
+    flex: none; width: 40px; height: 40px; border-radius: 11px;
+    background: var(--clay-soft); color: var(--clay);
     display: inline-flex; align-items: center; justify-content: center;
     transition: transform .28s cubic-bezier(.2,.7,.3,1);
   }
-  .ico svg { width: 23px; height: 23px; }
-  /* blood-red icon badges */
-  .ico { background: var(--clay-soft); color: var(--clay); }
+  .ico svg { width: 22px; height: 22px; }
   .step {
     flex: none; width: 30px; height: 30px; border-radius: 50%;
     background: var(--clay-soft); color: var(--clay-deep);
@@ -118,30 +127,28 @@
 
   /* ---------- buttons ---------- */
   button {
-    font-family: var(--sans); font-size: .95rem; font-weight: 600;
+    font-family: var(--sf); font-size: 1.0625rem; font-weight: 600;
     border: none; border-radius: 13px; padding: 0 20px; min-height: var(--tap);
-    cursor: pointer; background: var(--soft); color: var(--ink);
-    transition: transform .08s ease, filter .18s ease, background .18s ease, border-color .18s ease;
+    cursor: pointer; background: var(--fill); color: var(--ink);
+    transition: transform .1s ease, opacity .15s ease, background .15s ease;
   }
-  button:active { transform: scale(.97); }
-  .primary { background: var(--grad-btn); color: #fff; box-shadow: 0 6px 18px rgba(124,77,255,.34); }
-  .primary:hover { filter: brightness(1.07); }
-  .ghost { background: #fff; border: 1.5px solid var(--line); color: var(--clay-deep); }
-  .ghost:hover { background: var(--clay-soft); border-color: var(--clay-soft); }
+  button:active { transform: scale(.97); opacity: .85; }
+  .primary { background: var(--clay); color: #fff; }
+  .ghost { background: var(--fill); color: var(--clay); }
   .block { width: 100%; }
-  .tiny { min-height: 38px; padding: 0 14px; font-size: .85rem; }
+  .tiny { min-height: 36px; padding: 0 14px; font-size: .9rem; border-radius: 9px; }
   .actions { display: flex; gap: 10px; flex-wrap: wrap; }
   .actions button { flex: 1; min-width: 140px; }
 
-  /* ---------- inputs ---------- */
+  /* ---------- inputs (iOS filled fields) ---------- */
   input {
-    font-family: var(--sans); font-size: 1rem;
-    background: #fff; border: 1.5px solid var(--line); color: var(--ink);
-    border-radius: 13px; padding: 0 15px; min-height: var(--tap); width: 100%;
+    font-family: var(--sf); font-size: 1.0625rem;
+    background: var(--fill); border: 1px solid transparent; color: var(--ink);
+    border-radius: 11px; padding: 0 14px; min-height: var(--tap); width: 100%;
   }
-  input::placeholder { color: #a3a3aa; }
-  input:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 4px var(--clay-soft); }
-  label { font-size: .78rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 7px; letter-spacing: .02em; }
+  input::placeholder { color: #b0b0b6; }
+  input:focus { outline: none; background: #fff; border-color: var(--clay); }
+  label { font-size: .8rem; font-weight: 500; color: var(--muted); display: block; margin-bottom: 6px; letter-spacing: -.01em; }
 
   /* ---------- scan preview + ocr ---------- */
   .preview {
@@ -180,15 +187,15 @@
 
   /* ---------- items ---------- */
   .item {
-    border: 1px solid var(--line); border-radius: 16px;
-    padding: 15px; margin-bottom: 12px; background: var(--card);
+    border-radius: 14px;
+    padding: 14px; margin-bottom: 11px; background: var(--paper);
     animation: rise .28s ease both;
   }
   .item-head { display: flex; gap: 9px; align-items: center; }
-  .item-head .name { flex: 1; }
+  .item-head .name { flex: 1; background: #fff; }
   .price-wrap { position: relative; width: 104px; flex: none; }
   .price-wrap .cur { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
-  .price-wrap input { padding-left: 26px; text-align: right; }
+  .price-wrap input { padding-left: 26px; text-align: right; background: #fff; }
   .price-wrap input.review { border-color: var(--clay); background: var(--clay-soft); }
   .del { min-height: 44px; width: 44px; padding: 0; flex: none; background: transparent; color: var(--muted); font-size: 1.1rem; }
   .del:hover { background: var(--clay-soft); color: var(--danger); }
@@ -198,9 +205,9 @@
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .pchip, .chip-everyone {
     display: inline-flex; align-items: center; gap: 7px;
-    padding: 8px 14px; border-radius: 999px; font-size: .88rem; font-weight: 500;
-    cursor: pointer; user-select: none; border: 1.5px solid var(--line);
-    background: #fff; color: var(--muted);
+    padding: 8px 14px; border-radius: 999px; font-size: .9rem; font-weight: 500;
+    cursor: pointer; user-select: none; border: 1px solid var(--line);
+    background: #fff; color: #3a3a3e;
     transition: transform .08s ease, background .15s ease, color .15s ease, border-color .15s ease;
   }
   .pchip:active, .chip-everyone:active { transform: scale(.95); }
@@ -230,9 +237,9 @@
     font-size: .83rem; font-weight: 600; text-decoration: underline; text-underline-offset: 2px;
   }
   .link:hover { color: var(--clay); }
-  .seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 13px; overflow: hidden; flex: none; }
-  .seg button { border-radius: 0; min-height: var(--tap); background: #fff; padding: 0 17px; color: var(--muted); }
-  .seg button.on { background: var(--ink); color: #fff; }
+  .seg { display: inline-flex; gap: 2px; background: #e3e3e8; border-radius: 11px; padding: 3px; flex: none; }
+  .seg button { border-radius: 8px; min-height: 44px; background: transparent; padding: 0 16px; color: var(--ink); font-weight: 600; }
+  .seg button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.16), 0 1px 1px rgba(0,0,0,.04); }
 
   /* ---------- results ---------- */
   .result-row { display: flex; align-items: center; gap: 13px; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
@@ -293,6 +300,8 @@
 </head>
 <body>
 
+<div class="navbar" id="navbar">Split the Bill</div>
+
 <header class="hero">
   <h1>Split the Bill</h1>
   <p class="tagline">Scan a receipt, assign each item, and split tax &amp; tip in fair proportion.</p>
@@ -300,7 +309,7 @@
 
 <!-- 1 · ITEMS -->
 <section class="card">
-  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3L6 21V3z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><h2>Add items</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3L6 21V3z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><h2>Add items</h2></div>
   <p class="hint">Snap your receipt and we'll read the lines — or add them by hand.</p>
   <div class="actions">
     <button class="primary" type="button" onclick="pickFile()">Scan receipt</button>
@@ -320,7 +329,7 @@
 
 <!-- 2 · PEOPLE -->
 <section class="card">
-  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3.2"/><path d="M3.5 19c0-3.4 2.7-5.6 6-5.6 1.3 0 2.5.3 3.5 1"/><path d="M18.5 8v5M16 10.5h5"/></svg></span><h2>Add people</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3.2"/><path d="M3.5 19c0-3.4 2.7-5.6 6-5.6 1.3 0 2.5.3 3.5 1"/><path d="M18.5 8v5M16 10.5h5"/></svg></span><h2>Add people</h2></div>
   <div class="add-person">
     <input id="personName" type="text" placeholder="Add a name…" onkeydown="if(event.key==='Enter')addPerson()" />
     <button class="primary" type="button" onclick="addPerson()">Add</button>
@@ -330,14 +339,14 @@
 
 <!-- 3 · ASSIGN -->
 <section class="card">
-  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12.4 21.6a2 2 0 0 1-2.8 0l-6.2-6.2a2 2 0 0 1 0-2.8L11.6 4.4A2 2 0 0 1 13 3.8l5.6.1a2 2 0 0 1 2 2l.1 5.6a2 2 0 0 1-.7 1.3z"/><circle cx="16.2" cy="7.8" r="1.3"/></svg></span><h2>Assign items</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12.4 21.6a2 2 0 0 1-2.8 0l-6.2-6.2a2 2 0 0 1 0-2.8L11.6 4.4A2 2 0 0 1 13 3.8l5.6.1a2 2 0 0 1 2 2l.1 5.6a2 2 0 0 1-.7 1.3z"/><circle cx="16.2" cy="7.8" r="1.3"/></svg></span><h2>Assign items</h2></div>
   <p class="hint">Tap who shared each item — the cost splits evenly between them.</p>
   <div id="itemsList"></div>
 </section>
 
 <!-- 4 · TAX & TIP -->
 <section class="card">
-  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="7.5" cy="7.5" r="2.3"/><circle cx="16.5" cy="16.5" r="2.3"/></svg></span><h2>Tax &amp; tip</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="7.5" cy="7.5" r="2.3"/><circle cx="16.5" cy="16.5" r="2.3"/></svg></span><h2>Tax &amp; tip</h2></div>
   <div class="tt">
     <div class="field">
       <label>Tax</label>
@@ -367,7 +376,7 @@
 
 <!-- 5 · RESULTS -->
 <section class="card">
-  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><circle cx="12" cy="6" r="1.5"/><circle cx="12" cy="18" r="1.5"/></svg></span><h2>The split</h2></div>
+  <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><circle cx="12" cy="6" r="1.5"/><circle cx="12" cy="18" r="1.5"/></svg></span><h2>The split</h2></div>
   <div id="results"></div>
   <div class="grand">
     <span class="g-label">Total</span>
@@ -383,7 +392,7 @@
   <span class="dot">·</span>
   <span>Built with Claude · nothing saved</span>
   <span class="dot">·</span>
-  <span>build 12</span>
+  <span>build 13</span>
 </footer>
 
 <div class="sticky-bar">
@@ -925,6 +934,14 @@ async function shareSummary(){
 }
 
 render();
+
+// iOS-style: reveal the compact nav bar once the large title scrolls away.
+(() => {
+  const nav = document.getElementById('navbar');
+  const onScroll = () => nav.classList.toggle('show', window.scrollY > 52);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
 
 // Register the service worker (installable + offline). https only.
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
