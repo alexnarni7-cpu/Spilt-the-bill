@@ -353,10 +353,10 @@
   <div class="card-head"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3L6 21V3z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><h2>Add items</h2></div>
   <p class="hint">Snap your receipt and we'll read the lines — or add them by hand.</p>
   <div class="actions">
-    <button class="primary" type="button" onclick="pickFile()">Scan receipt</button>
+    <button class="primary" type="button" onclick="pickFile()">Scan or upload</button>
     <button class="ghost" type="button" onclick="addItem()">Add manually</button>
   </div>
-  <input id="file" type="file" accept="image/*" capture="environment" class="hidden" onchange="runOCR(this.files[0])" />
+  <input id="file" type="file" accept="image/*" class="hidden" onchange="runOCR(this.files[0])" />
   <div id="preview" class="preview hidden">
     <img id="previewImg" alt="Receipt photo" />
     <span class="pv-text" id="previewText">Reading your receipt…</span>
