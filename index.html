@@ -1,9 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!--
+  Split the Bill
+  © 2026 Alekhya Narni. All rights reserved.
+  Created by Alekhya Narni — https://www.linkedin.com/in/alekhya-narni/
+  Unauthorized copying, reuse, or redistribution of this code is prohibited.
+-->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Split the Bill</title>
+<title>Split the Bill — by Alekhya Narni</title>
+
+<!-- authorship / social preview -->
+<meta name="author" content="Alekhya Narni" />
+<meta name="description" content="Scan a receipt, assign each item, and split tax & tip fairly. Created by Alekhya Narni." />
+<meta property="og:title" content="Split the Bill" />
+<meta property="og:description" content="Scan a receipt, assign each item to who ordered it, and split tax & tip fairly. Created by Alekhya Narni." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://split-the-bill-07.netlify.app/" />
+<meta property="og:image" content="https://split-the-bill-07.netlify.app/icon-512.png" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Split the Bill" />
+<meta name="twitter:description" content="Split a bill fairly — by Alekhya Narni." />
 
 <!-- PWA / installable app -->
 <link rel="manifest" href="manifest.webmanifest" />
@@ -298,6 +316,9 @@
   }
   .footer strong { color: var(--ink); }
   .footer .dot { opacity: .5; }
+  .footer .credit { font-weight: 600; color: var(--ink); }
+  .footer a { color: var(--clay); font-weight: 600; text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
 
   /* ---------- sticky total ---------- */
   .sticky-bar {
@@ -407,12 +428,13 @@
   <p id="unassignedWarn" class="warn hidden"></p>
 </section>
 
-<footer id="footer" class="footer hidden">
-  <span>👀 <strong id="visitCount">—</strong> visits</span>
+<footer id="footer" class="footer">
+  <span class="credit">Made by <a href="https://www.linkedin.com/in/alekhya-narni/" target="_blank" rel="noopener">Alekhya Narni</a></span>
   <span class="dot">·</span>
-  <span>Built with Claude · nothing saved</span>
+  <span>© 2026 Alekhya Narni · All rights reserved</span>
+  <span id="visitWrap" class="hidden"><span class="dot">·</span> 👀 <strong id="visitCount">—</strong> visits</span>
   <span class="dot">·</span>
-  <span>build 14</span>
+  <span>build 15</span>
 </footer>
 
 <div class="sticky-bar">
@@ -987,8 +1009,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     const data = await res.json();
     sessionStorage.setItem('sb_counted', '1');
     document.getElementById('visitCount').textContent = (data.value ?? 0).toLocaleString();
-    document.getElementById('footer').classList.remove('hidden');
-  } catch (e) { /* counter offline — leave footer hidden */ }
+    document.getElementById('visitWrap').classList.remove('hidden');
+  } catch (e) { /* counter offline — credit/footer still shown */ }
 })();
 </script>
 </body>
