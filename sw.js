@@ -5,7 +5,7 @@
 //   • The page/HTML uses NETWORK-FIRST, so you always get the latest version
 //     when online, and fall back to the cached copy only when offline.
 //   • Other assets (icons, OCR library) use CACHE-FIRST for speed/offline.
-const CACHE = 'split-bill-v10';
+const CACHE = 'split-bill-v11';
 const ASSETS = [
   '.',
   'index.html',

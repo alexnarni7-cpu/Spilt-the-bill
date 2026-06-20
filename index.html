@@ -7,7 +7,7 @@
 
 <!-- PWA / installable app -->
 <link rel="manifest" href="manifest.webmanifest" />
-<meta name="theme-color" content="#fbfaff" />
+<meta name="theme-color" content="#f6f6f7" />
 <link rel="icon" href="icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -23,26 +23,26 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   :root {
-    --paper: #fbfaff;
+    --paper: #f6f6f7;
     --card: #ffffff;
-    --soft: #f1eefb;
-    --line: #eae6f6;
-    --line-soft: #f1eefb;
-    --ink: #241b3a;
-    --muted: #837f9c;
-    --clay: #7c4dff;          /* primary accent (violet) */
-    --clay-deep: #6c5ce7;
-    --clay-soft: #ece6ff;
-    --pink: #ff5fa2;
-    --orange: #ff8a3d;
-    --danger: #ef4d6b;
-    --grad: linear-gradient(120deg, #7c4dff 0%, #ff5fa2 55%, #ff8a3d 100%);
-    --grad-btn: linear-gradient(135deg, #7c4dff 0%, #9b51e0 100%);
+    --soft: #f1f1f2;
+    --line: #e5e5e7;
+    --line-soft: #efeff0;
+    --ink: #111113;
+    --muted: #6e6e76;
+    --clay: #b00710;          /* blood red accent */
+    --clay-deep: #8a0008;
+    --clay-soft: #fdeaea;
+    --pink: #b00710;
+    --orange: #b00710;
+    --danger: #b00710;
+    --grad: #b00710;
+    --grad-btn: #b00710;
     --radius: 22px;
     --tap: 50px;
     --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
     --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --shadow: 0 1px 2px rgba(40,20,80,.04), 0 10px 30px rgba(80,50,160,.07);
+    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.08);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
@@ -50,9 +50,7 @@
     margin: 0 auto;
     font-family: var(--sans);
     background:
-      radial-gradient(1100px 460px at 50% -160px, #efe7ff 0%, rgba(239,231,255,0) 62%),
-      radial-gradient(700px 380px at 100% 8%, #ffe9f3 0%, rgba(255,233,243,0) 55%),
-      radial-gradient(700px 380px at 0% 14%, #fff0e2 0%, rgba(255,240,226,0) 55%),
+      radial-gradient(1000px 420px at 50% -170px, rgba(176,7,16,.10) 0%, rgba(176,7,16,0) 60%),
       var(--paper);
     background-attachment: fixed;
     color: var(--ink);
@@ -68,11 +66,9 @@
   .hero h1 {
     font-family: var(--serif); font-weight: 600;
     font-size: 2.5rem; line-height: 1.05; letter-spacing: -.01em;
-    margin: 0 0 8px; font-optical-sizing: auto;
-    background: var(--grad);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; color: transparent;
+    margin: 0 0 8px; font-optical-sizing: auto; color: var(--ink);
   }
+  .hero h1 .dot-red { color: var(--clay); }
   .tagline { color: var(--muted); font-size: .95rem; margin: 0 auto; max-width: 340px; }
 
   /* ---------- cards ---------- */
@@ -109,12 +105,8 @@
     transition: transform .28s cubic-bezier(.2,.7,.3,1);
   }
   .ico svg { width: 23px; height: 23px; }
-  /* a distinct color per section icon */
-  .card:nth-of-type(1) .ico { background: #ffe6e2; color: #f0584f; }
-  .card:nth-of-type(2) .ico { background: #d8f6ef; color: #0fb89c; }
-  .card:nth-of-type(3) .ico { background: #ece4ff; color: #7c4dff; }
-  .card:nth-of-type(4) .ico { background: #fdeecf; color: #e08a16; }
-  .card:nth-of-type(5) .ico { background: #e1ecff; color: #3b82f6; }
+  /* blood-red icon badges */
+  .ico { background: var(--clay-soft); color: var(--clay); }
   .step {
     flex: none; width: 30px; height: 30px; border-radius: 50%;
     background: var(--clay-soft); color: var(--clay-deep);
@@ -150,7 +142,7 @@
     background: #fff; border: 1.5px solid var(--line); color: var(--ink);
     border-radius: 13px; padding: 0 15px; min-height: var(--tap); width: 100%;
   }
-  input::placeholder { color: #b0abc2; }
+  input::placeholder { color: #a3a3aa; }
   input:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 4px var(--clay-soft); }
   label { font-size: .78rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 7px; letter-spacing: .02em; }
 
@@ -219,7 +211,7 @@
   .pchip.on { color: #fff; font-weight: 600; }
   .chip-everyone { font-weight: 600; }
   .chip-everyone::before { content: "✦"; color: var(--clay); }
-  .chip-everyone.on { background: var(--grad-btn); color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(124,77,255,.28); }
+  .chip-everyone.on { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 4px 12px rgba(0,0,0,.22); }
   .chip-everyone.on::before { color: #fff; }
 
   /* ---------- empty states ---------- */
@@ -243,7 +235,7 @@
   .link:hover { color: var(--clay); }
   .seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 13px; overflow: hidden; flex: none; }
   .seg button { border-radius: 0; min-height: var(--tap); background: #fff; padding: 0 17px; color: var(--muted); }
-  .seg button.on { background: var(--grad-btn); color: #fff; }
+  .seg button.on { background: var(--ink); color: #fff; }
 
   /* ---------- results ---------- */
   .result-row { display: flex; align-items: center; gap: 13px; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
@@ -252,7 +244,7 @@
   .result-name { font-weight: 600; font-size: 1rem; }
   .result-lines { margin: 6px 0 4px; font-size: .82rem; }
   .result-lines > div { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; color: var(--ink); }
-  .result-lines .li-name { color: #4a4560; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .result-lines .li-name { color: #2a2a2e; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .result-lines .li-math { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .result-lines .li-sub { margin-top: 3px; padding-top: 4px; border-top: 1px dashed var(--line); font-weight: 600; }
   .result-lines .li-sub .li-name { color: var(--ink); }
@@ -270,7 +262,7 @@
     -webkit-text-fill-color: transparent; color: transparent;
   }
   .warn {
-    color: #8a2540; background: #ffe6ef; border: 1px solid #ffc9dd;
+    color: #8a0008; background: #fdeaea; border: 1px solid #f4c2c2;
     font-size: .85rem; border-radius: 13px; padding: 11px 14px; margin: 16px 0 0;
   }
 
@@ -394,7 +386,7 @@
   <span class="dot">·</span>
   <span>Built with Claude · nothing saved</span>
   <span class="dot">·</span>
-  <span>build 10</span>
+  <span>build 11</span>
 </footer>
 
 <div class="sticky-bar">
@@ -409,7 +401,7 @@ let people = [];   // [{id, name, color}]
 let items = [];    // [{id, name, price, assigned:Set, review}]
 let taxMode = 'amount', tipMode = 'amount';
 let pid = 1, iid = 1;
-const PALETTE = ['#f0584f','#7c4dff','#0fb89c','#3b82f6','#ec4899','#e08a16','#22a06b','#9b51e0'];
+const PALETTE = ['#b00710','#111113','#e23b3b','#5b5b62','#7d0a0e','#2d2d30','#d6212b','#8c8c94'];
 
 function uid(p){ return p==='person' ? 'p'+(pid++) : 'i'+(iid++); }
 function initials(name){
@@ -820,38 +812,38 @@ function buildSummaryCanvas(){
   function layout(ctx, draw){
     let y = pad + 38;
     if(draw){
-      ctx.fillStyle = '#241b3a'; ctx.font = `600 30px ${C_SERIF}`;
+      ctx.fillStyle = '#111113'; ctx.font = `600 30px ${C_SERIF}`;
       ctx.fillText('Split the Bill', cx, y);
-      ctx.fillStyle = '#837f9c'; ctx.font = `400 15px ${C_SANS}`;
+      ctx.fillStyle = '#6e6e76'; ctx.font = `400 15px ${C_SANS}`;
       ctx.textAlign = 'right'; ctx.fillText(dateStr, cr, y); ctx.textAlign = 'left';
     }
 
     // ITEMS
     if(items.length){
       y += 32;
-      if(draw){ ctx.fillStyle = '#837f9c'; ctx.font = `600 13px ${C_SANS}`; ctx.fillText('ITEMS', cx, y); }
+      if(draw){ ctx.fillStyle = '#6e6e76'; ctx.font = `600 13px ${C_SANS}`; ctx.fillText('ITEMS', cx, y); }
       items.forEach(it => {
         y += 25;
         if(draw){
           ctx.font = `400 15px ${C_SANS}`;
-          ctx.fillStyle = '#5a5470'; ctx.textAlign = 'right';
+          ctx.fillStyle = '#3a3a3e'; ctx.textAlign = 'right';
           ctx.fillText(money(it.price), cr, y); ctx.textAlign = 'left';
           ctx.fillStyle = '#3f3a33';
           ctx.fillText(trunc(ctx, it.name || 'Item', (cr - 95) - cx), cx, y);
         }
       });
       y += 16;
-      if(draw){ ctx.strokeStyle = '#eae6f6'; ctx.lineWidth = 1; hline(ctx, cx, cr, y); }
+      if(draw){ ctx.strokeStyle = '#e5e5e7'; ctx.lineWidth = 1; hline(ctx, cx, cr, y); }
     }
 
     // WHO OWES WHAT
     y += 30;
-    if(draw){ ctx.fillStyle = '#837f9c'; ctx.font = `600 13px ${C_SANS}`; ctx.fillText('WHO OWES WHAT', cx, y); }
+    if(draw){ ctx.fillStyle = '#6e6e76'; ctx.font = `600 13px ${C_SANS}`; ctx.fillText('WHO OWES WHAT', cx, y); }
     result.forEach((r, i) => {
       y += 28;
       if(draw){
         ctx.beginPath(); ctx.arc(cx + 7, y - 7, 7, 0, Math.PI*2); ctx.fillStyle = r.color; ctx.fill();
-        ctx.fillStyle = '#241b3a'; ctx.font = `600 21px ${C_SANS}`;
+        ctx.fillStyle = '#111113'; ctx.font = `600 21px ${C_SANS}`;
         ctx.fillText(r.name, cx + 24, y);
         ctx.font = `600 21px ${C_SERIF}`;
         ctx.textAlign = 'right'; ctx.fillText(money(r.total), cr, y); ctx.textAlign = 'left';
@@ -862,33 +854,33 @@ function buildSummaryCanvas(){
         if(draw){
           ctx.font = `400 13px ${C_SANS}`;
           const math = (l.n > 1 ? `${money(l.price)} ÷ ${l.n} = ` : '') + money(l.amount);
-          ctx.fillStyle = '#837f9c'; ctx.textAlign = 'right'; ctx.fillText(math, cr, y); ctx.textAlign = 'left';
-          ctx.fillStyle = '#4a4560'; ctx.fillText(trunc(ctx, l.name, (cr - 160) - (cx + 24)), cx + 24, y);
+          ctx.fillStyle = '#6e6e76'; ctx.textAlign = 'right'; ctx.fillText(math, cr, y); ctx.textAlign = 'left';
+          ctx.fillStyle = '#2a2a2e'; ctx.fillText(trunc(ctx, l.name, (cr - 160) - (cx + 24)), cx + 24, y);
         }
       });
       // subtotal + tax + tip = total
       y += 20;
       if(draw){
-        ctx.fillStyle = '#5a5470'; ctx.font = `600 13px ${C_SANS}`;
+        ctx.fillStyle = '#3a3a3e'; ctx.font = `600 13px ${C_SANS}`;
         ctx.fillText(`items ${money(r.items)}  +  tax ${fmtPct(taxRate)} ${money(r.tax)}  +  tip ${fmtPct(tipRate)} ${money(r.tip)}`, cx + 24, y);
       }
       y += 17;
-      if(i < result.length - 1 && draw){ ctx.strokeStyle = '#f1eefb'; hline(ctx, cx, cr, y); }
+      if(i < result.length - 1 && draw){ ctx.strokeStyle = '#efeff0'; hline(ctx, cx, cr, y); }
     });
 
     // TOTAL
     y += 12;
-    if(draw){ ctx.strokeStyle = '#eae6f6'; ctx.lineWidth = 1.5; hline(ctx, cx, cr, y); }
+    if(draw){ ctx.strokeStyle = '#e5e5e7'; ctx.lineWidth = 1.5; hline(ctx, cx, cr, y); }
     y += 38;
     if(draw){
-      ctx.fillStyle = '#241b3a'; ctx.font = `500 24px ${C_SERIF}`;
+      ctx.fillStyle = '#111113'; ctx.font = `500 24px ${C_SERIF}`;
       ctx.fillText('Total', cx, y);
-      ctx.fillStyle = '#6c5ce7'; ctx.font = `600 28px ${C_SERIF}`;
+      ctx.fillStyle = '#b00710'; ctx.font = `600 28px ${C_SERIF}`;
       ctx.textAlign = 'right'; ctx.fillText(money(grand), cr, y); ctx.textAlign = 'left';
     }
     y += 36;
     if(draw){
-      ctx.fillStyle = '#b0abc2'; ctx.font = `400 13px ${C_SANS}`; ctx.textAlign = 'center';
+      ctx.fillStyle = '#a3a3aa'; ctx.font = `400 13px ${C_SANS}`; ctx.textAlign = 'center';
       ctx.fillText('Tax & tip split proportionally · made with Claude', W/2, y);
       ctx.textAlign = 'left';
     }
@@ -903,10 +895,10 @@ function buildSummaryCanvas(){
   const ctx = canvas.getContext('2d');
   ctx.scale(scale, scale); ctx.textBaseline = 'alphabetic';
 
-  ctx.fillStyle = '#f4f1fc'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#f6f6f7'; ctx.fillRect(0, 0, W, H);
   roundRect(ctx, pad, pad, W - pad*2, H - pad*2, 22);
   ctx.fillStyle = '#ffffff'; ctx.fill();
-  ctx.strokeStyle = '#eae6f6'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.strokeStyle = '#e5e5e7'; ctx.lineWidth = 1; ctx.stroke();
 
   layout(ctx, true);
   return canvas;
