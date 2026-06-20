@@ -465,18 +465,25 @@ async function runOCR(file){
   txt.textContent = 'Reading receipt…';
   bar.style.width = '5%';
 
-  let worker;
   try {
-    txt.textContent = 'Enhancing photo…';
-    const processed = await preprocessReceipt(file);
-    txt.textContent = 'Reading receipt…';
-    worker = await Tesseract.createWorker('eng', 1, {
-      logger: m => { if(m.status === 'recognizing text') bar.style.width = Math.round(m.progress*100)+'%'; }
-    });
-    // PSM 4 = a single column of text of varying sizes — fits receipts well.
-    await worker.setParameters({ tessedit_pageseg_mode: '4', preserve_interword_spaces: '1' });
-    const { data } = await worker.recognize(processed);
-    const { items: found, tax, tip } = parseReceipt(data.text);
+    // Pass 1: the original photo with automatic layout (the dependable baseline).
+    txt.textContent = 'Reading receipt (1 of 2)…';
+    const passA = parseReceipt(await ocrRecognize(file, '3', bar));
+
+    // Pass 2: an enhanced (grayscale + contrast) image with receipt layout.
+    txt.textContent = 'Reading receipt (2 of 2)…';
+    let passB = { items: [], tax: null, tip: null };
+    try {
+      const processed = await preprocessReceipt(file);
+      passB = parseReceipt(await ocrRecognize(processed, '6', bar));
+    } catch(e){ console.warn('enhanced pass failed', e); }
+
+    // Keep whichever pass found more line-items; merge in any tax/tip either found.
+    const best = passB.items.length > passA.items.length ? passB : passA;
+    const found = best.items;
+    const tax = best.tax ?? passA.tax ?? passB.tax;
+    const tip = best.tip ?? passA.tip ?? passB.tip;
+
     found.forEach(f => addItem(f.name, f.price, true));
 
     const notes = [];
@@ -499,8 +506,20 @@ async function runOCR(file){
     txt.textContent = 'OCR needs internet for the first scan. Add items by hand below.';
     previewText.textContent = 'Scan unavailable — add items by hand.';
     console.error(e);
+  }
+}
+
+// Run one OCR pass on an image (File or canvas) and return the raw text.
+async function ocrRecognize(image, psm, bar){
+  const worker = await Tesseract.createWorker('eng', 1, {
+    logger: m => { if(bar && m.status === 'recognizing text') bar.style.width = Math.round(m.progress*100)+'%'; }
+  });
+  try {
+    await worker.setParameters({ tessedit_pageseg_mode: psm, preserve_interword_spaces: '1' });
+    const { data } = await worker.recognize(image);
+    return data.text || '';
   } finally {
-    if(worker){ try { await worker.terminate(); } catch(e){} }
+    try { await worker.terminate(); } catch(e){}
   }
 }
 
@@ -531,7 +550,7 @@ async function preprocessReceipt(file){
 
   const imageData = ctx.getImageData(0, 0, w, h);
   const d = imageData.data;
-  const contrast = 1.45, intercept = 128 * (1 - contrast);
+  const contrast = 1.25, intercept = 128 * (1 - contrast);
   for(let i = 0; i < d.length; i += 4){
     const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];   // grayscale
     let v = g * contrast + intercept;                      // contrast stretch around mid-gray
