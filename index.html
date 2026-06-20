@@ -218,6 +218,26 @@
   .chip-everyone.on { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 4px 12px rgba(0,0,0,.22); }
   .chip-everyone.on::before { color: #fff; }
 
+  /* iOS-style selectable rows with trailing checkmark */
+  .assign-rows { background: #fff; border-radius: 12px; overflow: hidden; }
+  .arow {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 46px; padding: 6px 14px; cursor: pointer; user-select: none;
+    transition: background .12s ease;
+  }
+  .arow:not(:last-child) { box-shadow: inset 0 -0.5px 0 var(--line); }
+  .arow:active { background: var(--fill); }
+  .arow-left { display: flex; align-items: center; gap: 11px; min-width: 0; }
+  .arow-name { font-size: 1.0625rem; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .arow-all {
+    width: 28px; height: 28px; border-radius: 50%; flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--clay-soft); color: var(--clay); font-size: .9rem;
+  }
+  .avatar.sm { width: 28px; height: 28px; font-size: .72rem; }
+  .arow .check { color: var(--clay); font-weight: 700; font-size: 1.1rem; opacity: 0; transform: scale(.6); transition: opacity .14s ease, transform .14s cubic-bezier(.2,.7,.3,1); }
+  .arow.on .check { opacity: 1; transform: scale(1); }
+
   /* ---------- empty states ---------- */
   .empty { text-align: center; padding: 26px 10px; color: var(--muted); }
   .empty .em { font-size: 1.8rem; opacity: .7; }
@@ -392,7 +412,7 @@
   <span class="dot">·</span>
   <span>Built with Claude · nothing saved</span>
   <span class="dot">·</span>
-  <span>build 13</span>
+  <span>build 14</span>
 </footer>
 
 <div class="sticky-bar">
@@ -445,10 +465,12 @@ function updateItem(id, field, val){
   else it.name = val;
   computeAndShowResults();   // live totals without losing input focus
 }
+function haptic(){ try { if(navigator.vibrate) navigator.vibrate(8); } catch(e){} }
 function toggleAssign(itemId, personId){
   const it = items.find(i => i.id === itemId);
   if(!it) return;
   it.assigned.has(personId) ? it.assigned.delete(personId) : it.assigned.add(personId);
+  haptic();
   render();
 }
 function assignAll(itemId){
@@ -457,6 +479,7 @@ function assignAll(itemId){
   const allOn = people.every(p => it.assigned.has(p.id));
   if(allOn) it.assigned.clear();
   else people.forEach(p => it.assigned.add(p.id));
+  haptic();
   render();
 }
 
@@ -696,11 +719,17 @@ function render(){
   } else {
     il.innerHTML = items.map(it => {
       const allOn = people.length && people.every(p => it.assigned.has(p.id));
-      const chips = people.length
-        ? `<span class="chip-everyone ${allOn?'on':''}" onclick="assignAll('${it.id}')">Everyone</span>` +
+      const rows = people.length
+        ? `<div class="arow ${allOn?'on':''}" onclick="assignAll('${it.id}')">
+             <div class="arow-left"><span class="arow-all">✦</span><span class="arow-name">Everyone</span></div>
+             <span class="check">✓</span>
+           </div>` +
           people.map(p => {
             const on = it.assigned.has(p.id);
-            return `<span class="pchip ${on?'on':''}" style="${on?`background:${p.color};border-color:${p.color}`:''}" onclick="toggleAssign('${it.id}','${p.id}')">${on?'':`<span class="pdot" style="background:${p.color}"></span>`}${esc(p.name)}</span>`;
+            return `<div class="arow ${on?'on':''}" onclick="toggleAssign('${it.id}','${p.id}')">
+              <div class="arow-left"><span class="avatar sm" style="background:${p.color}">${esc(initials(p.name))}</span><span class="arow-name">${esc(p.name)}</span></div>
+              <span class="check">✓</span>
+            </div>`;
           }).join('')
         : '<p class="soft" style="margin:0;">Add people above, then assign them here.</p>';
       return `<div class="item">
@@ -716,7 +745,7 @@ function render(){
         ${it.review ? '<span class="review-tag">scanned · check price</span>' : ''}
         <div class="assign">
           <span class="assign-label">SHARED BY</span>
-          <div class="chips">${chips}</div>
+          <div class="assign-rows">${rows}</div>
         </div>
       </div>`;
     }).join('');
