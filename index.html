@@ -432,7 +432,6 @@
   <span class="credit">Made by <a href="https://www.linkedin.com/in/alekhya-narni/" target="_blank" rel="noopener">Alekhya Narni</a></span>
   <span class="dot">·</span>
   <span>© 2026 Alekhya Narni · All rights reserved</span>
-  <span id="visitWrap" class="hidden"><span class="dot">·</span> 👀 <strong id="visitCount">—</strong> visits</span>
 </footer>
 
 <div class="sticky-bar">
@@ -997,19 +996,6 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
-// Privacy-friendly visit counter (Abacus — no cookies, no personal data).
-(async () => {
-  try {
-    const counted = sessionStorage.getItem('sb_counted');
-    const action = counted ? 'get' : 'hit';
-    const res = await fetch(`https://abacus.jasoncameron.dev/${action}/alexnarni7-spilt-the-bill/visits`);
-    if (!res.ok) return;
-    const data = await res.json();
-    sessionStorage.setItem('sb_counted', '1');
-    document.getElementById('visitCount').textContent = (data.value ?? 0).toLocaleString();
-    document.getElementById('visitWrap').classList.remove('hidden');
-  } catch (e) { /* counter offline — credit/footer still shown */ }
-})();
 </script>
 </body>
 </html>
